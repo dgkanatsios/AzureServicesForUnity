@@ -11,6 +11,9 @@ namespace AzureServicesForUnity
         public string Url = "https://unityservicesdemo.azurewebsites.net/tables/";
         public bool DebugFlag = true;
 
+        [HideInInspector]
+        public string AuthenticationToken;
+
         void Awake()
         {
             if (instance == null)
@@ -198,15 +201,20 @@ namespace AzureServicesForUnity
         {
             UnityWebRequest www = new UnityWebRequest(url, method);
 
-            www.SetRequestHeader("Accept", "application/json");
-            www.SetRequestHeader("Content-Type", "application/json");
+            www.SetRequestHeader(Constants.Accept, Constants.ApplicationJson);
+            www.SetRequestHeader(Constants.Content_Type, Constants.ApplicationJson);
             www.SetRequestHeader(Constants.ZumoString, Constants.ZumoVersion);
+
+            if (!string.IsNullOrEmpty(authenticationToken))
+                www.SetRequestHeader(Constants.ZumoAuth, authenticationToken.Trim());
+
             www.downloadHandler = new DownloadHandlerBuffer();
+
             if (json != null)
             {
                 byte[] payload = System.Text.Encoding.UTF8.GetBytes(json);
                 UploadHandler handler = new UploadHandlerRaw(payload);
-                handler.contentType = "application/json";
+                handler.contentType = Constants.ApplicationJson;
                 www.uploadHandler = handler;
             }
             return www;

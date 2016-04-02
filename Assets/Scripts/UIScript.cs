@@ -9,6 +9,7 @@ public class UIScript : MonoBehaviour
 {
     public void Start()
     {
+        UnityServices.Instance.AuthenticationToken = "";
     }
 
     public void Insert()
