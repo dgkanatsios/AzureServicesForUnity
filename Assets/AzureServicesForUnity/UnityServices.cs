@@ -205,8 +205,8 @@ namespace AzureServicesForUnity
             www.SetRequestHeader(Constants.Content_Type, Constants.ApplicationJson);
             www.SetRequestHeader(Constants.ZumoString, Constants.ZumoVersion);
 
-            if (!string.IsNullOrEmpty(authenticationToken))
-                www.SetRequestHeader(Constants.ZumoAuth, authenticationToken.Trim());
+            if (!string.IsNullOrEmpty(AuthenticationToken))
+                www.SetRequestHeader(Constants.ZumoAuth, AuthenticationToken.Trim());
 
             www.downloadHandler = new DownloadHandlerBuffer();
 
