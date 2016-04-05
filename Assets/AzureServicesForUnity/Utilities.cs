@@ -42,11 +42,14 @@ namespace AzureServicesForUnity
             }
         }
 
-        public static void ValidateForNull(object obj)
+        public static void ValidateForNull(params object[] objects)
         {
-            if (obj == null)
+            foreach (object obj in objects)
             {
-                throw new Exception("Argument null");
+                if (obj == null)
+                {
+                    throw new Exception("Argument null");
+                }
             }
 
         }
@@ -56,6 +59,12 @@ namespace AzureServicesForUnity
             return www.isError || (www.responseCode >= 400L && www.responseCode <= 500L);
         }
 
+        public static void BuildResponseObjectOnFailure(CallbackResponse response, UnityWebRequest www)
+        {
+            response.Status = CallBackResult.Failure;
+            Exception ex = new Exception(www.error ?? Constants.ErrorOccurred);
+            response.Exception = ex;
+        }
     }
 }
 

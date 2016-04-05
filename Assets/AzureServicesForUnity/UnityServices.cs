@@ -8,7 +8,7 @@ namespace AzureServicesForUnity
 {
     public class UnityServices : MonoBehaviour
     {
-        public string Url = "https://unityservicesdemo.azurewebsites.net/tables/";
+        public string Url = "https://unityservicesdemo.azurewebsites.net/tables/https://unityservicesdemo.azurewebsites.net/tables/";
         public bool DebugFlag = true;
 
         [HideInInspector]
@@ -40,61 +40,65 @@ namespace AzureServicesForUnity
             }
         }
 
-        public void Insert<T>(T instance, Action<T> onSuccess = null, Action<string> onError = null)
+        public void Insert<T>(T instance, Action<CallbackResponse<T>> onInsertCompleted)
+            where T : AzureObjectBase
+        {
+            Utilities.ValidateForNull(instance, onInsertCompleted);
+            StartCoroutine(InsertInternal(instance, onInsertCompleted));
+        }
+
+        public void SelectFiltered<T>(IQueryable<T> query, Action<CallbackResponse<T[]>> onSelectCompleted)
+            where T : AzureObjectBase
+        {
+            Utilities.ValidateForNull(onSelectCompleted); //query can be null
+            StartCoroutine(SelectInternal(query, onSelectCompleted));
+        }
+
+        public void SelectByID<T>(string id, Action<CallbackResponse<T>> onSelectSingleCompleted)
+            where T : AzureObjectBase
+        {
+            Utilities.ValidateForNull(id, onSelectSingleCompleted);
+            StartCoroutine(SelectByIDInternal<T>(id, onSelectSingleCompleted));
+        }
+
+        public void UpdateObject<T>(T instance, Action<CallbackResponse<T>> onUpdateCompleted)
             where T : AzureObjectBase
         {
             Utilities.ValidateForNull(instance);
-            StartCoroutine(InsertInternal(instance, onSuccess, onError));
+            StartCoroutine(UpdateInternal(instance, onUpdateCompleted));
         }
 
-        public void Select<T>(IQueryable<T> query, Action<T[]> onSuccess, Action<string> onError = null)
+        public void DeleteByID<T>(string id, Action<CallbackResponse> onDeleteCompleted)
             where T : AzureObjectBase
         {
-            StartCoroutine(SelectInternal(query, onSuccess, onError));
+            Utilities.ValidateForNull(id,onDeleteCompleted);
+            StartCoroutine(DeleteByIDInternal<Highscore>(id, onDeleteCompleted));
         }
 
-        public void SelectSingle<T>(string id, Action<T> onSuccess, Action<string> onError = null)
-            where T : AzureObjectBase
-        {
-            Utilities.ValidateForNull(id);
-            StartCoroutine(SelectSingleInternal<T>(id, onSuccess, onError));
-        }
-
-        public void UpdateObject<T>(T instance, Action<T> onSuccess = null, Action<string> onError = null)
-            where T : AzureObjectBase
-        {
-            Utilities.ValidateForNull(instance);
-            StartCoroutine(UpdateInternal(instance, onSuccess, onError));
-        }
-
-        public void Delete<T>(string id, Action onSuccess = null, Action<string> onError = null)
-            where T : AzureObjectBase
-        {
-            Utilities.ValidateForNull(id);
-            StartCoroutine(DeleteInternal<Highscore>(id, onSuccess, onError));
-        }
-
-        private IEnumerator DeleteInternal<T>(string id, Action onSuccess = null, Action<string> onError = null)
+        private IEnumerator DeleteByIDInternal<T>(string id, Action<CallbackResponse> onDeleteCompleted)
             where T : AzureObjectBase
         {
             using (UnityWebRequest www = BuildWebRequest<T>(GetRemoteUrl<T>() + "/" + WWW.EscapeURL(id), "DELETE", null))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
+
+                CallbackResponse response = new CallbackResponse();
+
                 if (Utilities.IsWWWError(www))
                 {
                     if (DebugFlag) Debug.Log(www.error);
-                    if (onError != null) onError(www.error ?? Constants.ErrorOccurred);
+                    Utilities.BuildResponseObjectOnFailure(response, www);
                 }
                 else
                 {
-                    if (onSuccess != null)
-                        onSuccess();
+                    response.Status = CallBackResult.Success;
                 }
+                onDeleteCompleted(response);
             }
         }
 
-        private IEnumerator InsertInternal<T>(T instance, Action<T> onSuccess = null, Action<string> onError = null)
+        private IEnumerator InsertInternal<T>(T instance, Action<CallbackResponse<T>> onInsertCompleted)
           where T : AzureObjectBase
         {
             string json = JsonUtility.ToJson(instance);
@@ -103,45 +107,67 @@ namespace AzureServicesForUnity
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
+
+                CallbackResponse<T> response = new CallbackResponse<T>();
+
                 if (Utilities.IsWWWError(www))
                 {
                     if (DebugFlag) Debug.Log(www.error);
-                    if (onError != null)
-                        onError(www.error ?? Constants.ErrorOccurred);
+                    Utilities.BuildResponseObjectOnFailure(response, www);
                 }
 
                 else if (www.downloadHandler != null)  //all OK
                 {
                     //let's get the new object that was created
-                    T newObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
-                    if(DebugFlag) Debug.Log("new object ID is " + newObject.id);
+                    try
+                    {
+                        T newObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
+                        if (DebugFlag) Debug.Log("new object ID is " + newObject.id);
+                        response.Status = CallBackResult.Success;
+                        response.Result = newObject;
+                    }
+                    catch (Exception ex)
+                    {
+                        response.Status = CallBackResult.DeserializationFailure;
+                        response.Exception = ex;
+                    }
                 }
+                onInsertCompleted(response);
             }
 
         }
 
-        private IEnumerator SelectSingleInternal<T>(string id, Action<T> onSuccess, Action<string> onError = null)
+        private IEnumerator SelectByIDInternal<T>(string id, Action<CallbackResponse<T>> onSelectSingleCompleted)
             where T : AzureObjectBase
         {
             using (UnityWebRequest www = BuildWebRequest<T>(GetRemoteUrl<T>() + "/" + WWW.EscapeURL(id), "GET", null))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
+                CallbackResponse<T> response = new CallbackResponse<T>();
                 if (Utilities.IsWWWError(www))
                 {
                     if (DebugFlag) Debug.Log(www.error);
-                    if (onError != null) onError(www.error ?? Constants.ErrorOccurred);
+                    Utilities.BuildResponseObjectOnFailure(response, www);
                 }
                 else
                 {
-                    T data = JsonUtility.FromJson<T>(www.downloadHandler.text);
-                    if (data != null)
-                        onSuccess(data);
+                    try
+                    {
+                        T data = JsonUtility.FromJson<T>(www.downloadHandler.text);
+                        response.Status = CallBackResult.Success;
+                    }
+                    catch (Exception ex)
+                    {
+                        response.Status = CallBackResult.Failure;
+                        response.Exception = ex;
+                    }
                 }
+                onSelectSingleCompleted(response);
             }
         }
 
-        private IEnumerator SelectInternal<T>(IQueryable<T> query, Action<T[]> onSuccess, Action<string> onError = null)
+        private IEnumerator SelectInternal<T>(IQueryable<T> query, Action<CallbackResponse<T[]>> onSelectCompleted)
            where T : AzureObjectBase
         {
             string url = GetRemoteUrl<T>();
@@ -154,22 +180,26 @@ namespace AzureServicesForUnity
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
-                if (www.isError || www.downloadHandler == null)
+
+                CallbackResponse<T[]> response = new CallbackResponse<T[]>();
+
+                if (Utilities.IsWWWError(www))
                 {
                     if (DebugFlag) Debug.Log(www.error);
-                    if (onError != null)
-                        onError(www.error ?? Constants.ErrorOccurred);
+                    Utilities.BuildResponseObjectOnFailure(response, www);
                 }
                 else
                 {
+                    response.Status = CallBackResult.Success;
                     T[] data = Utilities.DeserializeJsonArray<T>(www.downloadHandler.text);
                     if (data != null)
-                        onSuccess(data);
+                        response.Result = data;
                 }
+                onSelectCompleted(response);
             }
         }
 
-        private IEnumerator UpdateInternal<T>(T instance, Action<T> onSuccess = null, Action<string> onError = null)
+        private IEnumerator UpdateInternal<T>(T instance, Action<CallbackResponse<T>> onUpdateCompleted)
            where T : AzureObjectBase
         {
             string json = JsonUtility.ToJson(instance);
@@ -177,21 +207,29 @@ namespace AzureServicesForUnity
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
-                if (www.isError || www.downloadHandler == null)
+                CallbackResponse<T> response = new CallbackResponse<T>();
+                if (Utilities.IsWWWError(www))
                 {
                     if (DebugFlag) Debug.Log(www.error);
-                    if (onError != null) onError(www.error ?? Constants.ErrorOccurred);
+                    Utilities.BuildResponseObjectOnFailure(response, www);
                 }
                 else if (www.downloadHandler != null)  //all OK
                 {
                     //let's get the new object that was created
-                    T updatedObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
-                    if (DebugFlag) Debug.Log("updated object ID is " + updatedObject.id);
-                    if (onSuccess != null)
+                    try
                     {
-                        onSuccess(updatedObject);
+                        T updatedObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
+                        if (DebugFlag) Debug.Log("updated object ID is " + updatedObject.id);
+                        response.Status = CallBackResult.Success;
+                        response.Result = updatedObject;
+                    }
+                    catch (Exception ex)
+                    {
+                        response.Status = CallBackResult.DeserializationFailure;
+                        response.Exception = ex;
                     }
                 }
+                onUpdateCompleted(response);
             }
 
         }

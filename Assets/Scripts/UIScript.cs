@@ -17,7 +17,13 @@ public class UIScript : MonoBehaviour
         Highscore score = new Highscore();
         score.playername = "Zookee";
         score.score = 54;
-        UnityServices.Instance.Insert(score);
+        UnityServices.Instance.Insert(score, insertResponse =>
+        {
+            if (insertResponse.Status == CallBackResult.Success)
+            {
+                Debug.Log("Insert completed");
+            }
+        });
     }
 
     public void GetAll()
@@ -26,46 +32,71 @@ public class UIScript : MonoBehaviour
         ODataQuery<Highscore> q = new ODataQuery<Highscore>(odqp);
 
         string pn = "Zookee";
-        var lala = q.Where(x => x.score > 500 || x.playername == pn ).OrderBy(x=>x.score);
+        var query = q.Where(x => x.score > 500 || x.playername == pn).OrderBy(x => x.score);
 
-        UnityServices.Instance.Select<Highscore>(lala, x =>
+        UnityServices.Instance.SelectFiltered<Highscore>(query, x =>
         {
-            foreach (var item in x)
+            if (x.Status == CallBackResult.Success)
             {
-                Debug.Log(item.score);
+                foreach (var item in x.Result)
+                {
+                    Debug.Log(item.score);
+                }
+            }
+            else
+            {
+                Debug.Log(x.Exception.Message);
             }
         });
     }
 
     public void GetSingle()
     {
-        UnityServices.Instance.SelectSingle<Highscore>("afdd7698-bba2-4a41-bb70-d9e202d91130", x =>
+        UnityServices.Instance.SelectByID<Highscore>("afdd7698-bba2-4a41-bb70-d9e202d91130", x =>
         {
-            Debug.Log(x.score);
+            if (x.Status == CallBackResult.Success)
+            {
+                Highscore hs = x.Result;
+                Debug.Log(hs.score);
+            }
         });
     }
 
     public void UpdateSingle()
     {
-        UnityServices.Instance.SelectSingle<Highscore>("afdd7698-bba2-4a41-bb70-d9e202d91130", x =>
+        UnityServices.Instance.SelectByID<Highscore>("afdd7698-bba2-4a41-bb70-d9e202d91130", selectResponse =>
         {
-            x.score += 1;
-            UnityServices.Instance.UpdateObject(x, y =>
+            if (selectResponse.Status == CallBackResult.Success)
             {
-                UnityServices.Instance.SelectSingle<Highscore>("afdd7698-bba2-4a41-bb70-d9e202d91130", z =>
+                Highscore hs = selectResponse.Result;
+                hs.score += 1;
+                UnityServices.Instance.UpdateObject(hs, updateResponse =>
                 {
-                    Debug.Log(z.score);
+                    if (updateResponse.Status == CallBackResult.Success)
+                    {
+                        Debug.Log("object with id " + updateResponse.Result.id + " was updated");
+                    }
                 });
-            });
+            }
         });
     }
 
     public void Delete()
     {
-        UnityServices.Instance.SelectSingle<Highscore>("b199d724-6f15-4e44-abbe-d1e9d1f751da", x =>
+        UnityServices.Instance.SelectByID<Highscore>("b199d724-6f15-4e44-abbe-d1e9d1f751da", selectResponse =>
         {
-            UnityServices.Instance.Delete<Highscore>(x.id, () =>
-            Debug.Log("successfully deleted ID = " + x.id));
+            if (selectResponse.Status == CallBackResult.Success)
+            {
+                Highscore hs = selectResponse.Result;
+                UnityServices.Instance.DeleteByID<Highscore>(hs.id, deleteResponse =>
+                {
+                    if (deleteResponse.Status == CallBackResult.Success)
+                    {
+                        Debug.Log("successfully deleted ID = " + hs.id);
+                    }
+                }
+                );
+            }
         });
     }
 }
