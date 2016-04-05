@@ -20,6 +20,7 @@ namespace AzureServicesForUnity
     {
         Success,
         Failure,
-        DeserializationFailure
+        DeserializationFailure,
+        NotFound
     }
 }

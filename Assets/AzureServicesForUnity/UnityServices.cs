@@ -8,7 +8,7 @@ namespace AzureServicesForUnity
 {
     public class UnityServices : MonoBehaviour
     {
-        public string Url = "https://unityservicesdemo.azurewebsites.net/tables/https://unityservicesdemo.azurewebsites.net/tables/";
+        public string Url = "https://unityservicesdemo.azurewebsites.net";
         public bool DebugFlag = true;
 
         [HideInInspector]
@@ -40,6 +40,15 @@ namespace AzureServicesForUnity
             }
         }
 
+        public void CallAPI<T>(string apiname, Action<CallbackResponse<T>> onInvokeAPICompleted)
+            where T : class
+        {
+            Utilities.ValidateForNull(apiname, onInvokeAPICompleted);
+            StartCoroutine(CallAPIInternal(apiname, onInvokeAPICompleted));
+        }
+
+
+
         public void Insert<T>(T instance, Action<CallbackResponse<T>> onInsertCompleted)
             where T : AzureObjectBase
         {
@@ -51,7 +60,7 @@ namespace AzureServicesForUnity
             where T : AzureObjectBase
         {
             Utilities.ValidateForNull(onSelectCompleted); //query can be null
-            StartCoroutine(SelectInternal(query, onSelectCompleted));
+            StartCoroutine(SelectFilteredInternal(query, onSelectCompleted));
         }
 
         public void SelectByID<T>(string id, Action<CallbackResponse<T>> onSelectSingleCompleted)
@@ -78,7 +87,7 @@ namespace AzureServicesForUnity
         private IEnumerator DeleteByIDInternal<T>(string id, Action<CallbackResponse> onDeleteCompleted)
             where T : AzureObjectBase
         {
-            using (UnityWebRequest www = BuildWebRequest<T>(GetRemoteUrl<T>() + "/" + WWW.EscapeURL(id), "DELETE", null))
+            using (UnityWebRequest www = BuildWebRequest<T>(GetTablesUrl<T>() + "/" + WWW.EscapeURL(id), "DELETE", null))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
@@ -103,7 +112,7 @@ namespace AzureServicesForUnity
         {
             string json = JsonUtility.ToJson(instance);
 
-            using (UnityWebRequest www = BuildWebRequest<T>(GetRemoteUrl<T>(), "POST", json))
+            using (UnityWebRequest www = BuildWebRequest<T>(GetTablesUrl<T>(), "POST", json))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
@@ -139,7 +148,7 @@ namespace AzureServicesForUnity
         private IEnumerator SelectByIDInternal<T>(string id, Action<CallbackResponse<T>> onSelectSingleCompleted)
             where T : AzureObjectBase
         {
-            using (UnityWebRequest www = BuildWebRequest<T>(GetRemoteUrl<T>() + "/" + WWW.EscapeURL(id), "GET", null))
+            using (UnityWebRequest www = BuildWebRequest<T>(GetTablesUrl<T>() + "/" + WWW.EscapeURL(id), "GET", null))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
@@ -167,10 +176,10 @@ namespace AzureServicesForUnity
             }
         }
 
-        private IEnumerator SelectInternal<T>(IQueryable<T> query, Action<CallbackResponse<T[]>> onSelectCompleted)
+        private IEnumerator SelectFilteredInternal<T>(IQueryable<T> query, Action<CallbackResponse<T[]>> onSelectCompleted)
            where T : AzureObjectBase
         {
-            string url = GetRemoteUrl<T>();
+            string url = GetTablesUrl<T>();
             if (query != null)
             {
                 url += query.ToString();
@@ -202,7 +211,7 @@ namespace AzureServicesForUnity
            where T : AzureObjectBase
         {
             string json = JsonUtility.ToJson(instance);
-            using (UnityWebRequest www = BuildWebRequest<T>(GetRemoteUrl<T>(), "PATCH", json))
+            using (UnityWebRequest www = BuildWebRequest<T>(GetTablesUrl<T>(), "PATCH", json))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
@@ -233,8 +242,42 @@ namespace AzureServicesForUnity
 
         }
 
+        private IEnumerator CallAPIInternal<T>(string apiname,Action<CallbackResponse<T>> onInvokeAPICompleted)
+            where T : class
+        {
+            using (UnityWebRequest www = BuildWebRequest<T>(GetApiUrl(apiname), "POST", null))
+            {
+                yield return www.Send();
+                if (DebugFlag) Debug.Log(www.responseCode);
+                CallbackResponse<T> response = new CallbackResponse<T>();
+                if (Utilities.IsWWWError(www))
+                {
+                    if (DebugFlag) Debug.Log(www.error);
+                    Utilities.BuildResponseObjectOnFailure(response, www);
+                }
+                else if (www.downloadHandler != null)  //all OK
+                {
+                    try
+                    {
+                        //FromJson method does not do well with single quotes...
+                        T returnObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
+                        response.Status = CallBackResult.Success;
+                        response.Result = returnObject;
+                    }
+                    catch (Exception ex)
+                    {
+                        response.Status = CallBackResult.DeserializationFailure;
+                        response.Exception = ex;
+                    }
+                }
+                onInvokeAPICompleted(response);
+
+            }
+        }
+
+
         private UnityWebRequest BuildWebRequest<T>(string url, string method, string json)
-            where T : AzureObjectBase
+            where T : class
         {
             UnityWebRequest www = new UnityWebRequest(url, method);
 
@@ -258,9 +301,14 @@ namespace AzureServicesForUnity
 
         }
 
-        private string GetRemoteUrl<T>()
+        private string GetTablesUrl<T>()
         {
-            return Url + typeof(T).Name;
+            return string.Format("{0}/tables/{1}", Url, typeof(T).Name);
+        }
+
+        private string GetApiUrl(string apiname)
+        {
+            return string.Format("{0}/api/{1}", Url, apiname);
         }
 
     }

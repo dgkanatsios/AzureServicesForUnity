@@ -12,6 +12,20 @@ public class UIScript : MonoBehaviour
         UnityServices.Instance.AuthenticationToken = "";
     }
 
+
+    public void CallAPI()
+    {
+        //custom message is response.send(200, "{\"message\": \"hello world\", \"data\": \"15\"}") in hello.js
+        UnityServices.Instance.CallAPI<CustomAPIReturnObject>("hello", response =>
+         {
+             if(response.Status == CallBackResult.Success)
+             {
+                 CustomAPIReturnObject caro = response.Result;
+                 Debug.Log(string.Format("message is {0} and data is {1}", caro.message, caro.data));
+             }
+         });
+    }
+
     public void Insert()
     {
         Highscore score = new Highscore();
@@ -26,7 +40,7 @@ public class UIScript : MonoBehaviour
         });
     }
 
-    public void GetAll()
+    public void SelectFiltered()
     {
         ODataQueryProvider odqp = new ODataQueryProvider();
         ODataQuery<Highscore> q = new ODataQuery<Highscore>(odqp);
@@ -50,7 +64,7 @@ public class UIScript : MonoBehaviour
         });
     }
 
-    public void GetSingle()
+    public void SelectByID()
     {
         UnityServices.Instance.SelectByID<Highscore>("afdd7698-bba2-4a41-bb70-d9e202d91130", x =>
         {
@@ -81,7 +95,7 @@ public class UIScript : MonoBehaviour
         });
     }
 
-    public void Delete()
+    public void DeleteByID()
     {
         UnityServices.Instance.SelectByID<Highscore>("b199d724-6f15-4e44-abbe-d1e9d1f751da", selectResponse =>
         {
@@ -105,8 +119,14 @@ public class UIScript : MonoBehaviour
 [Serializable()]
 public class Highscore : AzureObjectBase
 {
-
     public int score;
     public string playername;
+}
+
+[Serializable()]
+public class CustomAPIReturnObject
+{
+    public string message;
+    public int data;
 }
 

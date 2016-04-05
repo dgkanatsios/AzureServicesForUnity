@@ -61,7 +61,11 @@ namespace AzureServicesForUnity
 
         public static void BuildResponseObjectOnFailure(CallbackResponse response, UnityWebRequest www)
         {
-            response.Status = CallBackResult.Failure;
+            if (www.responseCode == 404L)
+                response.Status = CallBackResult.NotFound;
+            else
+                response.Status = CallBackResult.Failure;
+
             Exception ex = new Exception(www.error ?? Constants.ErrorOccurred);
             response.Exception = ex;
         }
