@@ -71,7 +71,7 @@ namespace AzureServicesForUnity
         public void DeleteByID<T>(string id, Action<CallbackResponse> onDeleteCompleted)
             where T : AzureObjectBase
         {
-            Utilities.ValidateForNull(id,onDeleteCompleted);
+            Utilities.ValidateForNull(id, onDeleteCompleted);
             StartCoroutine(DeleteByIDInternal<Highscore>(id, onDeleteCompleted));
         }
 
@@ -134,7 +134,6 @@ namespace AzureServicesForUnity
                 }
                 onInsertCompleted(response);
             }
-
         }
 
         private IEnumerator SelectByIDInternal<T>(string id, Action<CallbackResponse<T>> onSelectSingleCompleted)
@@ -155,6 +154,7 @@ namespace AzureServicesForUnity
                     try
                     {
                         T data = JsonUtility.FromJson<T>(www.downloadHandler.text);
+                        response.Result = data;
                         response.Status = CallBackResult.Success;
                     }
                     catch (Exception ex)
@@ -192,8 +192,7 @@ namespace AzureServicesForUnity
                 {
                     response.Status = CallBackResult.Success;
                     T[] data = Utilities.DeserializeJsonArray<T>(www.downloadHandler.text);
-                    if (data != null)
-                        response.Result = data;
+                    response.Result = data;
                 }
                 onSelectCompleted(response);
             }
@@ -266,4 +265,16 @@ namespace AzureServicesForUnity
 
     }
 }
+
+
+///Some helpful links, included here for reference
+///Table operations on Azure: https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-node-backend-how-to-use-server-sdk/#howto-dynamicschema
+///How to use the managed client: https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-dotnet-how-to-use-client-library/#inserting
+///Basic OData tutorial: http://www.odata.org/getting-started/basic-tutorial/
+///OData URI conventions: http://www.odata.org/documentation/odata-version-2-0/uri-conventions/
+///OData operations: http://www.odata.org/documentation/odata-version-2-0/operations/
+///Walkthough: creating an IQueryable LINQ provider: https://msdn.microsoft.com/en-us/library/bb546158(v=vs.110).aspx
+///Building an IQueryable provider blog post series: https://blogs.msdn.microsoft.com/mattwar/page/3/
+///Add authentication to your Windows app: https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-windows-store-dotnet-get-started-users/
+///How to configure Facebook authentication: https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-how-to-configure-facebook-authentication/
 
