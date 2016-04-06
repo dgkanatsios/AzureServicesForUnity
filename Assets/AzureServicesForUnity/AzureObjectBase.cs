@@ -5,7 +5,6 @@ using System.Text;
 
 namespace AzureServicesForUnity
 {
-
     [Serializable()]
     public abstract class AzureObjectBase
     {

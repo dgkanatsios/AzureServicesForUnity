@@ -69,6 +69,46 @@ namespace AzureServicesForUnity
             Exception ex = new Exception(www.error ?? Constants.ErrorOccurred);
             response.Exception = ex;
         }
+
+        /// <summary>
+        /// Builds and returns a UnityWebRequest object
+        /// </summary>
+        /// <param name="url">Url to hit</param>
+        /// <param name="method">POST,GET, etc.</param>
+        /// <param name="json">Any JSON to send</param>
+        /// <param name="authenticationToken">Authentication token for the headers</param>
+        /// <returns>A UnityWebRequest object</returns>
+        public static UnityWebRequest BuildWebRequest(string url, string method, string json, string authenticationToken)
+        {
+            UnityWebRequest www = new UnityWebRequest(url, method);
+
+            www.SetRequestHeader(Constants.Accept, Constants.ApplicationJson);
+            www.SetRequestHeader(Constants.Content_Type, Constants.ApplicationJson);
+            www.SetRequestHeader(Constants.ZumoString, Constants.ZumoVersion);
+
+            if (!string.IsNullOrEmpty(authenticationToken))
+                www.SetRequestHeader(Constants.ZumoAuth, authenticationToken.Trim());
+
+            www.downloadHandler = new DownloadHandlerBuffer();
+
+            if (!string.IsNullOrEmpty(json))
+            {
+                byte[] payload = Encoding.UTF8.GetBytes(json);
+                UploadHandler handler = new UploadHandlerRaw(payload);
+                handler.contentType = Constants.ApplicationJson;
+                www.uploadHandler = handler;
+            }
+            return www;
+        }
+    }
+
+    public enum HttpMethod
+    {
+        Post,
+        Get,
+        Patch,
+        Delete,
+        Put
     }
 }
 

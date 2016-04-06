@@ -4,26 +4,35 @@ using System;
 using AzureServicesForUnity;
 using AzureServicesForUnity.QueryHelpers;
 using System.Linq;
+using UnityEngine.UI;
 
 public class UIScript : MonoBehaviour
 {
+    public Text StatusText;
+
     public void Start()
     {
+        //get the authentication token somehow...
+        //e.g. for facebook, check the Unity Facebook SDK at https://developers.facebook.com/docs/unity
         UnityServices.Instance.AuthenticationToken = "";
     }
 
 
     public void CallAPI()
     {
-        //custom message is response.send(200, "{\"message\": \"hello world\", \"data\": \"15\"}") in hello.js
-        UnityServices.Instance.CallAPI<CustomAPIReturnObject>("hello", response =>
+        //custom message is: response.send(200, "{\"message\": \"hello world\", \"data\": \"15\"}") 
+        //in hello.js and method is POST
+        UnityServices.Instance.CallAPI<CustomAPIReturnObject>("hello", HttpMethod.Post, response =>
          {
-             if(response.Status == CallBackResult.Success)
+             if (response.Status == CallBackResult.Success)
              {
-                 CustomAPIReturnObject caro = response.Result;
-                 Debug.Log(string.Format("message is {0} and data is {1}", caro.message, caro.data));
+                 CustomAPIReturnObject obj = response.Result;
+                 string result = string.Format("message is {0} and data is {1}", obj.message, obj.data);
+                 Debug.Log(result);
+                 StatusText.text = result;
              }
          });
+        StatusText.text = "Loading...";
     }
 
     public void Insert()
@@ -35,9 +44,12 @@ public class UIScript : MonoBehaviour
         {
             if (insertResponse.Status == CallBackResult.Success)
             {
-                Debug.Log("Insert completed");
+                string result = "Insert completed";
+                Debug.Log(result);
+                StatusText.text = result;
             }
         });
+        StatusText.text = "Loading...";
     }
 
     public void SelectFiltered()
@@ -54,14 +66,16 @@ public class UIScript : MonoBehaviour
             {
                 foreach (var item in x.Result)
                 {
-                    Debug.Log(item.score);
+                    Debug.Log("new score is " + item.score);
                 }
+                StatusText.text = "success, found " + x.Result.Count() + " results";
             }
             else
             {
                 Debug.Log(x.Exception.Message);
             }
         });
+        StatusText.text = "Loading...";
     }
 
     public void SelectByID()
@@ -72,8 +86,10 @@ public class UIScript : MonoBehaviour
             {
                 Highscore hs = x.Result;
                 Debug.Log(hs.score);
+                StatusText.text = "score of selected Highscore entry is " + hs.score;
             }
         });
+        StatusText.text = "Loading...";
     }
 
     public void UpdateSingle()
@@ -88,11 +104,14 @@ public class UIScript : MonoBehaviour
                 {
                     if (updateResponse.Status == CallBackResult.Success)
                     {
-                        Debug.Log("object with id " + updateResponse.Result.id + " was updated");
+                        string msg = "object with id " + updateResponse.Result.id + " was updated";
+                        Debug.Log(msg);
+                        StatusText.text = msg;
                     }
                 });
             }
         });
+        StatusText.text = "Loading...";
     }
 
     public void DeleteByID()
@@ -106,12 +125,15 @@ public class UIScript : MonoBehaviour
                 {
                     if (deleteResponse.Status == CallBackResult.Success)
                     {
-                        Debug.Log("successfully deleted ID = " + hs.id);
+                        string msg = "successfully deleted ID = " + hs.id;
+                        Debug.Log(msg);
+                        StatusText.text = msg;
                     }
                 }
                 );
             }
         });
+        StatusText.text = "Loading...";
     }
 }
 

@@ -35,19 +35,21 @@ namespace AzureServicesForUnity
                 if (instance == null)
                 {
                     instance = new UnityServices();
+                    if (instance.DebugFlag)
+                        Debug.Log("instantiated Azure Services for Unity version " + Constants.LibraryVersion);
                 }
                 return instance;
             }
         }
 
-        public void CallAPI<T>(string apiname, Action<CallbackResponse<T>> onInvokeAPICompleted)
+        #region Public methods
+
+        public void CallAPI<T>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted)
             where T : class
         {
             Utilities.ValidateForNull(apiname, onInvokeAPICompleted);
-            StartCoroutine(CallAPIInternal(apiname, onInvokeAPICompleted));
+            StartCoroutine(CallAPIInternal(apiname, method, onInvokeAPICompleted));
         }
-
-
 
         public void Insert<T>(T instance, Action<CallbackResponse<T>> onInsertCompleted)
             where T : AzureObjectBase
@@ -84,10 +86,13 @@ namespace AzureServicesForUnity
             StartCoroutine(DeleteByIDInternal<Highscore>(id, onDeleteCompleted));
         }
 
+        #endregion
+
         private IEnumerator DeleteByIDInternal<T>(string id, Action<CallbackResponse> onDeleteCompleted)
             where T : AzureObjectBase
         {
-            using (UnityWebRequest www = BuildWebRequest<T>(GetTablesUrl<T>() + "/" + WWW.EscapeURL(id), "DELETE", null))
+            using (UnityWebRequest www = Utilities.BuildWebRequest
+                (GetTablesUrl<T>() + "/" + WWW.EscapeURL(id), HttpMethod.Delete.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
@@ -112,7 +117,8 @@ namespace AzureServicesForUnity
         {
             string json = JsonUtility.ToJson(instance);
 
-            using (UnityWebRequest www = BuildWebRequest<T>(GetTablesUrl<T>(), "POST", json))
+            using (UnityWebRequest www = Utilities.BuildWebRequest(GetTablesUrl<T>(),
+                HttpMethod.Post.ToString(), json,AuthenticationToken))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
@@ -148,7 +154,8 @@ namespace AzureServicesForUnity
         private IEnumerator SelectByIDInternal<T>(string id, Action<CallbackResponse<T>> onSelectSingleCompleted)
             where T : AzureObjectBase
         {
-            using (UnityWebRequest www = BuildWebRequest<T>(GetTablesUrl<T>() + "/" + WWW.EscapeURL(id), "GET", null))
+            using (UnityWebRequest www = Utilities.BuildWebRequest
+                (GetTablesUrl<T>() + "/" + WWW.EscapeURL(id), HttpMethod.Get.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
@@ -185,7 +192,8 @@ namespace AzureServicesForUnity
                 url += query.ToString();
             }
             if (DebugFlag) Debug.Log(url);
-            using (UnityWebRequest www = BuildWebRequest<T>(url, "GET", null))
+            using (UnityWebRequest www = Utilities.BuildWebRequest(url, 
+                HttpMethod.Get.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
@@ -211,7 +219,8 @@ namespace AzureServicesForUnity
            where T : AzureObjectBase
         {
             string json = JsonUtility.ToJson(instance);
-            using (UnityWebRequest www = BuildWebRequest<T>(GetTablesUrl<T>(), "PATCH", json))
+            using (UnityWebRequest www = Utilities.BuildWebRequest(GetTablesUrl<T>(),
+                HttpMethod.Patch.ToString(), json, AuthenticationToken))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
@@ -223,9 +232,8 @@ namespace AzureServicesForUnity
                 }
                 else if (www.downloadHandler != null)  //all OK
                 {
-                    //let's get the new object that was created
                     try
-                    {
+                    { //let's get the new object that was created
                         T updatedObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
                         if (DebugFlag) Debug.Log("updated object ID is " + updatedObject.id);
                         response.Status = CallBackResult.Success;
@@ -242,10 +250,11 @@ namespace AzureServicesForUnity
 
         }
 
-        private IEnumerator CallAPIInternal<T>(string apiname,Action<CallbackResponse<T>> onInvokeAPICompleted)
+        private IEnumerator CallAPIInternal<T>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted)
             where T : class
         {
-            using (UnityWebRequest www = BuildWebRequest<T>(GetApiUrl(apiname), "POST", null))
+            using (UnityWebRequest www = Utilities.BuildWebRequest(GetApiUrl(apiname),
+                method.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
                 if (DebugFlag) Debug.Log(www.responseCode);
@@ -276,30 +285,7 @@ namespace AzureServicesForUnity
         }
 
 
-        private UnityWebRequest BuildWebRequest<T>(string url, string method, string json)
-            where T : class
-        {
-            UnityWebRequest www = new UnityWebRequest(url, method);
 
-            www.SetRequestHeader(Constants.Accept, Constants.ApplicationJson);
-            www.SetRequestHeader(Constants.Content_Type, Constants.ApplicationJson);
-            www.SetRequestHeader(Constants.ZumoString, Constants.ZumoVersion);
-
-            if (!string.IsNullOrEmpty(AuthenticationToken))
-                www.SetRequestHeader(Constants.ZumoAuth, AuthenticationToken.Trim());
-
-            www.downloadHandler = new DownloadHandlerBuffer();
-
-            if (json != null)
-            {
-                byte[] payload = System.Text.Encoding.UTF8.GetBytes(json);
-                UploadHandler handler = new UploadHandlerRaw(payload);
-                handler.contentType = Constants.ApplicationJson;
-                www.uploadHandler = handler;
-            }
-            return www;
-
-        }
 
         private string GetTablesUrl<T>()
         {
