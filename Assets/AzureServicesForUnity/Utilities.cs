@@ -23,20 +23,21 @@ namespace AzureServicesForUnity
                     return null;
 
                 //http://stackoverflow.com/questions/20243621/regular-expression-for-a-json-type-string
-                var match = Regex.Match(json, "({.*?})");
+                Match match = Regex.Match(json, "({.*?})");
 
                 List<T> objectInstances = new List<T>();
 
-                for (int i = 0; i < match.Groups.Count; i++)
+                while(match.Success)
                 {
                     try
                     {
-                        objectInstances.Add(JsonUtility.FromJson<T>(match.Groups[i].Value));
+                        objectInstances.Add(JsonUtility.FromJson<T>(match.Value));
                     }
                     catch
                     {
                         //if you cannot deserialize a single object contained in the array, suppress
                     }
+                    match = match.NextMatch();
                 }
                 return objectInstances.ToArray();
             }

@@ -14,7 +14,7 @@ public class UIScript : MonoBehaviour
     {
         //get the authentication token somehow...
         //e.g. for facebook, check the Unity Facebook SDK at https://developers.facebook.com/docs/unity
-        UnityServices.Instance.AuthenticationToken = "";
+        AzureUnityServices.Instance.AuthenticationToken = "";
     }
 
 
@@ -22,7 +22,7 @@ public class UIScript : MonoBehaviour
     {
         //custom message is: response.send(200, "{\"message\": \"hello world\", \"data\": \"15\"}") 
         //in hello.js and method is POST
-        UnityServices.Instance.CallAPI<CustomAPIReturnObject>("hello", HttpMethod.Post, response =>
+        AzureUnityServices.Instance.CallAPI<CustomAPIReturnObject>("Hello", HttpMethod.Post, response =>
          {
              if (response.Status == CallBackResult.Success)
              {
@@ -38,9 +38,9 @@ public class UIScript : MonoBehaviour
     public void Insert()
     {
         Highscore score = new Highscore();
-        score.playername = "Zookee";
-        score.score = 54;
-        UnityServices.Instance.Insert(score, insertResponse =>
+        score.playername = "dimitris";
+        score.score = UnityEngine.Random.Range(10,100);
+        AzureUnityServices.Instance.Insert(score, insertResponse =>
         {
             if (insertResponse.Status == CallBackResult.Success)
             {
@@ -57,16 +57,16 @@ public class UIScript : MonoBehaviour
         ODataQueryProvider odqp = new ODataQueryProvider();
         ODataQuery<Highscore> q = new ODataQuery<Highscore>(odqp);
 
-        string pn = "Zookee";
-        var query = q.Where(x => x.score > 500 || x.playername == pn).OrderBy(x => x.score);
+        string pn = "d";
+        var query = q.Where(x => x.score > 500 || x.playername.StartsWith(pn)).OrderBy(x => x.score);
 
-        UnityServices.Instance.SelectFiltered<Highscore>(query, x =>
+        AzureUnityServices.Instance.SelectFiltered<Highscore>(query, x =>
         {
             if (x.Status == CallBackResult.Success)
             {
                 foreach (var item in x.Result)
                 {
-                    Debug.Log("new score is " + item.score);
+                    Debug.Log("score is " + item.score);
                 }
                 StatusText.text = "success, found " + x.Result.Count() + " results";
             }
@@ -80,7 +80,7 @@ public class UIScript : MonoBehaviour
 
     public void SelectByID()
     {
-        UnityServices.Instance.SelectByID<Highscore>("afdd7698-bba2-4a41-bb70-d9e202d91130", x =>
+        AzureUnityServices.Instance.SelectByID<Highscore>("bbd01bc4-52db-407d-83a4-d8b5422e300f", x =>
         {
             if (x.Status == CallBackResult.Success)
             {
@@ -94,13 +94,13 @@ public class UIScript : MonoBehaviour
 
     public void UpdateSingle()
     {
-        UnityServices.Instance.SelectByID<Highscore>("afdd7698-bba2-4a41-bb70-d9e202d91130", selectResponse =>
+        AzureUnityServices.Instance.SelectByID<Highscore>("bbd01bc4-52db-407d-83a4-d8b5422e300f", selectResponse =>
         {
             if (selectResponse.Status == CallBackResult.Success)
             {
                 Highscore hs = selectResponse.Result;
                 hs.score += 1;
-                UnityServices.Instance.UpdateObject(hs, updateResponse =>
+                AzureUnityServices.Instance.UpdateObject(hs, updateResponse =>
                 {
                     if (updateResponse.Status == CallBackResult.Success)
                     {
@@ -116,12 +116,12 @@ public class UIScript : MonoBehaviour
 
     public void DeleteByID()
     {
-        UnityServices.Instance.SelectByID<Highscore>("b199d724-6f15-4e44-abbe-d1e9d1f751da", selectResponse =>
+        AzureUnityServices.Instance.SelectByID<Highscore>("bbd01bc4-52db-407d-83a4-d8b5422e300f", selectResponse =>
         {
             if (selectResponse.Status == CallBackResult.Success)
             {
                 Highscore hs = selectResponse.Result;
-                UnityServices.Instance.DeleteByID<Highscore>(hs.id, deleteResponse =>
+                AzureUnityServices.Instance.DeleteByID<Highscore>(hs.id, deleteResponse =>
                 {
                     if (deleteResponse.Status == CallBackResult.Success)
                     {

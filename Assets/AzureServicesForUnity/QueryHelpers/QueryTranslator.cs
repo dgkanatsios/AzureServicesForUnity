@@ -17,7 +17,7 @@ namespace AzureServicesForUnity.QueryHelpers
                 sb.Append("&$filter=");
                 this.Visit(StripQuotes(odqr.WhereExpression.Arguments[1]));
             }
-            if(odqr.SkipExpression !=null)
+            if (odqr.SkipExpression != null)
             {
                 sb.Append("&$skip=");
                 this.Visit(StripQuotes(odqr.SkipExpression.Arguments[1]));
@@ -38,7 +38,7 @@ namespace AzureServicesForUnity.QueryHelpers
                     sb.Append(" desc");
                 }
             }
-            if(odqr.SelectExpression!=null)
+            if (odqr.SelectExpression != null)
             {
                 sb.Append("&$select=");
                 var selectExpr = StripQuotes(odqr.SelectExpression.Arguments[1]);
@@ -89,9 +89,44 @@ namespace AzureServicesForUnity.QueryHelpers
                 sb.Append(" desc");
                 return m;
             }
+            
             else if (m.Method.DeclaringType == typeof(Queryable) && m.Method.Name == "Select")
             {
                 //do nothing
+                return m;
+            }
+            else if (m.Method.DeclaringType == typeof(string) && m.Method.Name == "StartsWith")
+            {
+                sb.Append("startswith(");
+                this.Visit(m.Object);
+                sb.Append(",");
+                Expression expr = StripQuotes(m.Arguments[0]);
+                this.Visit(expr);
+                sb.Append(")");
+                return m;
+            }
+            else if (m.Method.DeclaringType == typeof(string) && m.Method.Name == "Contains")
+            {
+                sb.Append("substringof(");
+                Expression expr = StripQuotes(m.Arguments[0]);
+                this.Visit(expr);
+                sb.Append(",");
+                this.Visit(m.Object);
+                sb.Append(")");
+                return m;
+            }
+            else if (m.Method.DeclaringType == typeof(string) && m.Method.Name == "ToUpper")
+            {
+                sb.Append("toupper(");
+                this.Visit(m.Object);
+                sb.Append(")");
+                return m;
+            }
+            else if (m.Method.DeclaringType == typeof(string) && m.Method.Name == "ToLower")
+            {
+                sb.Append("tolower(");
+                this.Visit(m.Object);
+                sb.Append(")");
                 return m;
             }
             else
@@ -99,6 +134,8 @@ namespace AzureServicesForUnity.QueryHelpers
                 throw new NotSupportedException(string.Format("The method ‘{ 0 }’ is not supported", m.Method.Name));
             }
         }
+
+
         protected override Expression VisitUnary(UnaryExpression u)
         {
             switch (u.NodeType)
@@ -161,7 +198,8 @@ namespace AzureServicesForUnity.QueryHelpers
             {
                 sb.Append("NULL");
             }
-            else {
+            else
+            {
                 switch (Type.GetTypeCode(c.Value.GetType()))
                 {
                     case TypeCode.Boolean:

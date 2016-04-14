@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace AzureServicesForUnity
 {
-    public class UnityServices : MonoBehaviour
+    public class AzureUnityServices : MonoBehaviour
     {
-        public string Url = "https://unityservicesdemo.azurewebsites.net";
+        public string Url;
         public bool DebugFlag = true;
 
         [HideInInspector]
@@ -16,32 +16,18 @@ namespace AzureServicesForUnity
 
         void Awake()
         {
-            if (instance == null)
-            {
-                instance = this;
-            }
-            else
-            {
-                DestroyImmediate(this);
-            }
             Utilities.ValidateForNull(Url);
         }
 
-        private static UnityServices instance;
-        public static UnityServices Instance
+        void Start()
         {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new UnityServices();
-                    if (instance.DebugFlag)
-                        Debug.Log("instantiated Azure Services for Unity version " + Constants.LibraryVersion);
-                }
-                return instance;
-            }
+            Instance = this;
+            if (Instance.DebugFlag)
+                Debug.Log("instantiated Azure Services for Unity version " + Constants.LibraryVersion);
         }
 
+        public static AzureUnityServices Instance;
+       
         #region Public methods
 
         public void CallAPI<T>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted)
@@ -65,11 +51,11 @@ namespace AzureServicesForUnity
             StartCoroutine(SelectFilteredInternal(query, onSelectCompleted));
         }
 
-        public void SelectByID<T>(string id, Action<CallbackResponse<T>> onSelectSingleCompleted)
+        public void SelectByID<T>(string id, Action<CallbackResponse<T>> onSelectByIDCompleted)
             where T : AzureObjectBase
         {
-            Utilities.ValidateForNull(id, onSelectSingleCompleted);
-            StartCoroutine(SelectByIDInternal<T>(id, onSelectSingleCompleted));
+            Utilities.ValidateForNull(id, onSelectByIDCompleted);
+            StartCoroutine(SelectByIDInternal<T>(id, onSelectByIDCompleted));
         }
 
         public void UpdateObject<T>(T instance, Action<CallbackResponse<T>> onUpdateCompleted)
@@ -151,7 +137,7 @@ namespace AzureServicesForUnity
             }
         }
 
-        private IEnumerator SelectByIDInternal<T>(string id, Action<CallbackResponse<T>> onSelectSingleCompleted)
+        private IEnumerator SelectByIDInternal<T>(string id, Action<CallbackResponse<T>> onSelectByIDCompleted)
             where T : AzureObjectBase
         {
             using (UnityWebRequest www = Utilities.BuildWebRequest
@@ -179,7 +165,7 @@ namespace AzureServicesForUnity
                         response.Exception = ex;
                     }
                 }
-                onSelectSingleCompleted(response);
+                onSelectByIDCompleted(response);
             }
         }
 
