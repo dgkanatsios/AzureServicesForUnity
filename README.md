@@ -4,3 +4,7 @@ Microsoft Azure has a great service to host apps called [App Service](https://az
 Unity has a great class to do HTTP requests called [UnityWebRequest](http://docs.unity3d.com/Manual/UnityWebRequest.html). It's relatively new but it can be really helpful. Plus, there is another handy class called [JsonUtility](http://docs.unity3d.com/ScriptReference/JsonUtility.html) that assists in JSON serialization/deserialization.
 
 Combine the above two paragraphs and you have a small cross platform library that allows a Unity game access Azure Easy Tables.
+
+Current version: 0.0.2 (beta)
+
+For information and usage instructions check https://dgkanatsios.com/2016/04/14/use-azure-services-from-unity/
