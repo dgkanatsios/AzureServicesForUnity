@@ -57,7 +57,7 @@ namespace AzureServicesForUnity
 
         public static bool IsWWWError(UnityWebRequest www)
         {
-            return www.isError || (www.responseCode >= 400L && www.responseCode <= 500L);
+            return www.isError || (www.responseCode >= 400L && www.responseCode <= 511L);
         }
 
         public static void BuildResponseObjectOnFailure(CallbackResponse response, UnityWebRequest www)
