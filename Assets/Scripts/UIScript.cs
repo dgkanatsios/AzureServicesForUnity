@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 using AzureServicesForUnity;
-using AzureServicesForUnity.QueryHelpers;
+using AzureServicesForUnity.QueryHelpers.Other;
 using System.Linq;
 using UnityEngine.UI;
 
@@ -31,6 +31,10 @@ public class UIScript : MonoBehaviour
                  Debug.Log(result);
                  StatusText.text = result;
              }
+             else
+             {
+                 ShowError(response.Exception.Message);
+             }
          });
         StatusText.text = "Loading...";
     }
@@ -48,17 +52,21 @@ public class UIScript : MonoBehaviour
                 Debug.Log(result);
                 StatusText.text = result;
             }
+            else
+            {
+                ShowError(insertResponse.Exception.Message);
+            }
         });
         StatusText.text = "Loading...";
     }
 
     public void SelectFiltered()
     {
-        ODataQueryProvider odqp = new ODataQueryProvider();
-        ODataQuery<Highscore> q = new ODataQuery<Highscore>(odqp);
+        EasyTableQueryHelper<Highscore> queryHelper = new EasyTableQueryHelper<Highscore>();
+        
 
         string pn = "d";
-        var query = q.Where(x => x.score > 500 || x.playername.StartsWith(pn)).OrderBy(x => x.score);
+        var query = queryHelper.Where(x => x.score > 500 || x.playername.StartsWith(pn)).OrderBy(x => x.score);
 
         AzureUnityServices.Instance.SelectFiltered<Highscore>(query, x =>
         {
@@ -66,27 +74,37 @@ public class UIScript : MonoBehaviour
             {
                 foreach (var item in x.Result)
                 {
-                    Debug.Log("score is " + item.score);
+                    Debug.Log(string.Format("ID is {0},score is {1}", item.id, item.score ));
                 }
                 StatusText.text = "success, found " + x.Result.Count() + " results";
             }
             else
             {
-                Debug.Log(x.Exception.Message);
+                ShowError(x.Exception.Message);
             }
         });
         StatusText.text = "Loading...";
     }
 
+    private void ShowError(string error)
+    {
+        Debug.Log(error);
+        StatusText.text = "Error: " + error;
+    }
+
     public void SelectByID()
     {
-        AzureUnityServices.Instance.SelectByID<Highscore>("bbd01bc4-52db-407d-83a4-d8b5422e300f", x =>
+        AzureUnityServices.Instance.SelectByID<Highscore>("ecca86cb-8e35-47ac-8eef-74dc2ef87faa", x =>
         {
             if (x.Status == CallBackResult.Success)
             {
                 Highscore hs = x.Result;
                 Debug.Log(hs.score);
                 StatusText.text = "score of selected Highscore entry is " + hs.score;
+            }
+            else
+            {
+                ShowError(x.Exception.Message);
             }
         });
         StatusText.text = "Loading...";
@@ -108,7 +126,15 @@ public class UIScript : MonoBehaviour
                         Debug.Log(msg);
                         StatusText.text = msg;
                     }
+                    else
+                    {
+                        ShowError(updateResponse.Exception.Message);
+                    }
                 });
+            }
+            else
+            {
+                ShowError(selectResponse.Exception.Message);
             }
         });
         StatusText.text = "Loading...";
@@ -129,8 +155,15 @@ public class UIScript : MonoBehaviour
                         Debug.Log(msg);
                         StatusText.text = msg;
                     }
-                }
-                );
+                    else
+                    {
+                        ShowError(deleteResponse.Exception.Message);
+                    }
+                });
+            }
+            else
+            {
+                ShowError(selectResponse.Exception.Message);
             }
         });
         StatusText.text = "Loading...";

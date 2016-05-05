@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using UnityEngine.Experimental.Networking;
 using System.Linq;
+using AzureServicesForUnity.QueryHelpers.Linq;
 
 namespace AzureServicesForUnity
 {
@@ -44,7 +45,7 @@ namespace AzureServicesForUnity
             StartCoroutine(InsertInternal(instance, onInsertCompleted));
         }
 
-        public void SelectFiltered<T>(IQueryable<T> query, Action<CallbackResponse<T[]>> onSelectCompleted)
+        public void SelectFiltered<T>(EasyTableQuery<T> query, Action<CallbackResponse<T[]>> onSelectCompleted)
             where T : AzureObjectBase
         {
             Utilities.ValidateForNull(onSelectCompleted); //query can be null
@@ -169,13 +170,13 @@ namespace AzureServicesForUnity
             }
         }
 
-        private IEnumerator SelectFilteredInternal<T>(IQueryable<T> query, Action<CallbackResponse<T[]>> onSelectCompleted)
+        private IEnumerator SelectFilteredInternal<T>(EasyTableQuery<T> query, Action<CallbackResponse<T[]>> onSelectCompleted)
            where T : AzureObjectBase
         {
             string url = GetTablesUrl<T>();
             if (query != null)
             {
-                url += query.ToString();
+                url += "?" + query.ToODataString();
             }
             if (DebugFlag) Debug.Log(url);
             using (UnityWebRequest www = Utilities.BuildWebRequest(url, 
