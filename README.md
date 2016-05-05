@@ -12,7 +12,7 @@ For information and usage instructions check https://dgkanatsios.com/2016/04/14/
 Changelog
 
 version 0.0.3
-Integrated the (much better) official OData query translator from the [official App Service .NET client](https://github.com/Azure/azure-mobile-apps-net-client/tree/master/src/Microsoft.WindowsAzure.MobileServices/Table)
+-Integrated the (much better) official OData query translator from the [official App Service .NET client](https://github.com/Azure/azure-mobile-apps-net-client/tree/master/src/Microsoft.WindowsAzure.MobileServices/Table)
 
 version 0.0.2
-Initial commit
+-Initial commit
