@@ -69,7 +69,7 @@ namespace AzureServicesForUnity.QueryHelpers.Linq
         {
             // Evaluate any independent subexpressions so we end up with a tree
             // full of constants or things that depend directly on our values.
-            Expression expression = PartialEvaluator.PartiallyEvaluate(this.query.Query.Expression);
+            Expression expression = PartialEvaluatorNoEmit.Eval(this.query.Query.Expression);
 
             // Build a new query from the expression tree
             this.Visit(expression);
