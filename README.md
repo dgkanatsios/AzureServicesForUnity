@@ -13,6 +13,7 @@ For information and usage instructions check https://dgkanatsios.com/2016/04/14/
 
 ####version 0.0.5
 - Namespace changes, separating Easy Table and Easy APIs
+- Target for next version is a *.unitypackage file creation, fingers crossed!
 
 ####version 0.0.4
 - Fix for issue about [OData not working on iOS] (https://github.com/dgkanatsios/AzureServicesForUnity/issues/1). Many thanks to Matt Warren for pointing me to a PartialEvaluator solution that does not use Reflection.Emit (check [here](https://github.com/mattwar/iqtoolkit/blob/master/src/IQToolkit/ExpressionEvaluator.cs)) and [9 to Friday studio](http://www.9tofriday.co.za/) for precious help in debugging.
