@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AzureServicesForUnity
+namespace AzureServicesForUnity.Helpers
 {
     /// <summary>
     /// Static variables
@@ -21,6 +21,8 @@ namespace AzureServicesForUnity
 
         public static readonly string ErrorOccurred = "Error occurred";
 
-        public static readonly string LibraryVersion = "0.0.4";
+        public static readonly string LibraryVersion = "0.0.5";
+
+        
     }
 }

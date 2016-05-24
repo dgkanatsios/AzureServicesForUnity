@@ -1,16 +1,19 @@
-﻿using UnityEngine;
-using System.Collections;
-using System;
-using UnityEngine.Experimental.Networking;
-using System.Linq;
+﻿using AzureServicesForUnity.Helpers;
 using AzureServicesForUnity.QueryHelpers.Linq;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using UnityEngine.Experimental.Networking;
 
 namespace AzureServicesForUnity
 {
-    public class AzureUnityServices : MonoBehaviour
+    public class EasyTables : MonoBehaviour
     {
         public string Url;
-        public bool DebugFlag = true;
+        public static EasyTables Instance;
 
         [HideInInspector]
         public string AuthenticationToken;
@@ -23,20 +26,12 @@ namespace AzureServicesForUnity
         void Start()
         {
             Instance = this;
-            if (Instance.DebugFlag)
-                Debug.Log("instantiated Azure Services for Unity version " + Constants.LibraryVersion);
         }
 
-        public static AzureUnityServices Instance;
-       
+
         #region Public methods
 
-        public void CallAPI<T>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted)
-            where T : class
-        {
-            Utilities.ValidateForNull(apiname, onInvokeAPICompleted);
-            StartCoroutine(CallAPIInternal(apiname, method, onInvokeAPICompleted));
-        }
+
 
         public void Insert<T>(T instance, Action<CallbackResponse<T>> onInsertCompleted)
             where T : AzureObjectBase
@@ -82,13 +77,13 @@ namespace AzureServicesForUnity
                 (GetTablesUrl<T>() + "/" + WWW.EscapeURL(id), HttpMethod.Delete.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
-                if (DebugFlag) Debug.Log(www.responseCode);
+                if (Globals.DebugFlag) Debug.Log(www.responseCode);
 
                 CallbackResponse response = new CallbackResponse();
 
                 if (Utilities.IsWWWError(www))
                 {
-                    if (DebugFlag) Debug.Log(www.error);
+                    if (Globals.DebugFlag) Debug.Log(www.error);
                     Utilities.BuildResponseObjectOnFailure(response, www);
                 }
                 else
@@ -105,16 +100,16 @@ namespace AzureServicesForUnity
             string json = JsonUtility.ToJson(instance);
 
             using (UnityWebRequest www = Utilities.BuildWebRequest(GetTablesUrl<T>(),
-                HttpMethod.Post.ToString(), json,AuthenticationToken))
+                HttpMethod.Post.ToString(), json, AuthenticationToken))
             {
                 yield return www.Send();
-                if (DebugFlag) Debug.Log(www.responseCode);
+                if (Globals.DebugFlag) Debug.Log(www.responseCode);
 
                 CallbackResponse<T> response = new CallbackResponse<T>();
 
                 if (Utilities.IsWWWError(www))
                 {
-                    if (DebugFlag) Debug.Log(www.error);
+                    if (Globals.DebugFlag) Debug.Log(www.error);
                     Utilities.BuildResponseObjectOnFailure(response, www);
                 }
 
@@ -124,7 +119,7 @@ namespace AzureServicesForUnity
                     try
                     {
                         T newObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
-                        if (DebugFlag) Debug.Log("new object ID is " + newObject.id);
+                        if (Globals.DebugFlag) Debug.Log("new object ID is " + newObject.id);
                         response.Status = CallBackResult.Success;
                         response.Result = newObject;
                     }
@@ -145,11 +140,11 @@ namespace AzureServicesForUnity
                 (GetTablesUrl<T>() + "/" + WWW.EscapeURL(id), HttpMethod.Get.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
-                if (DebugFlag) Debug.Log(www.responseCode);
+                if (Globals.DebugFlag) Debug.Log(www.responseCode);
                 CallbackResponse<T> response = new CallbackResponse<T>();
                 if (Utilities.IsWWWError(www))
                 {
-                    if (DebugFlag) Debug.Log(www.error);
+                    if (Globals.DebugFlag) Debug.Log(www.error);
                     Utilities.BuildResponseObjectOnFailure(response, www);
                 }
                 else
@@ -178,18 +173,18 @@ namespace AzureServicesForUnity
             {
                 url += "?" + query.ToODataString();
             }
-            if (DebugFlag) Debug.Log(url);
-            using (UnityWebRequest www = Utilities.BuildWebRequest(url, 
+            if (Globals.DebugFlag) Debug.Log(url);
+            using (UnityWebRequest www = Utilities.BuildWebRequest(url,
                 HttpMethod.Get.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
-                if (DebugFlag) Debug.Log(www.responseCode);
+                if (Globals.DebugFlag) Debug.Log(www.responseCode);
 
                 CallbackResponse<T[]> response = new CallbackResponse<T[]>();
 
                 if (Utilities.IsWWWError(www))
                 {
-                    if (DebugFlag) Debug.Log(www.error);
+                    if (Globals.DebugFlag) Debug.Log(www.error);
                     Utilities.BuildResponseObjectOnFailure(response, www);
                 }
                 else
@@ -210,11 +205,11 @@ namespace AzureServicesForUnity
                 HttpMethod.Patch.ToString(), json, AuthenticationToken))
             {
                 yield return www.Send();
-                if (DebugFlag) Debug.Log(www.responseCode);
+                if (Globals.DebugFlag) Debug.Log(www.responseCode);
                 CallbackResponse<T> response = new CallbackResponse<T>();
                 if (Utilities.IsWWWError(www))
                 {
-                    if (DebugFlag) Debug.Log(www.error);
+                    if (Globals.DebugFlag) Debug.Log(www.error);
                     Utilities.BuildResponseObjectOnFailure(response, www);
                 }
                 else if (www.downloadHandler != null)  //all OK
@@ -222,7 +217,7 @@ namespace AzureServicesForUnity
                     try
                     { //let's get the new object that was created
                         T updatedObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
-                        if (DebugFlag) Debug.Log("updated object ID is " + updatedObject.id);
+                        if (Globals.DebugFlag) Debug.Log("updated object ID is " + updatedObject.id);
                         response.Status = CallBackResult.Success;
                         response.Result = updatedObject;
                     }
@@ -237,56 +232,16 @@ namespace AzureServicesForUnity
 
         }
 
-        private IEnumerator CallAPIInternal<T>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted)
-            where T : class
-        {
-            using (UnityWebRequest www = Utilities.BuildWebRequest(GetApiUrl(apiname),
-                method.ToString(), null, AuthenticationToken))
-            {
-                yield return www.Send();
-                if (DebugFlag) Debug.Log(www.responseCode);
-                CallbackResponse<T> response = new CallbackResponse<T>();
-                if (Utilities.IsWWWError(www))
-                {
-                    if (DebugFlag) Debug.Log(www.error);
-                    Utilities.BuildResponseObjectOnFailure(response, www);
-                }
-                else if (www.downloadHandler != null)  //all OK
-                {
-                    try
-                    {
-                        //FromJson method does not do well with single quotes...
-                        T returnObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
-                        response.Status = CallBackResult.Success;
-                        response.Result = returnObject;
-                    }
-                    catch (Exception ex)
-                    {
-                        response.Status = CallBackResult.DeserializationFailure;
-                        response.Exception = ex;
-                    }
-                }
-                onInvokeAPICompleted(response);
-
-            }
-        }
-
-
-
+       
 
         private string GetTablesUrl<T>()
         {
             return string.Format("{0}/tables/{1}", Url, typeof(T).Name);
         }
 
-        private string GetApiUrl(string apiname)
-        {
-            return string.Format("{0}/api/{1}", Url, apiname);
-        }
-
+       
     }
 }
-
 
 ///Some helpful links, included here for reference
 ///Table operations on Azure: https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-node-backend-how-to-use-server-sdk/#howto-dynamicschema
@@ -298,4 +253,5 @@ namespace AzureServicesForUnity
 ///Building an IQueryable provider blog post series: https://blogs.msdn.microsoft.com/mattwar/page/3/
 ///Add authentication to your Windows app: https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-windows-store-dotnet-get-started-users/
 ///How to configure Facebook authentication: https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-how-to-configure-facebook-authentication/
+
 

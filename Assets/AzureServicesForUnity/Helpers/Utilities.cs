@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Experimental.Networking;
 
-namespace AzureServicesForUnity
+namespace AzureServicesForUnity.Helpers
 {
     public static class Utilities
     {
