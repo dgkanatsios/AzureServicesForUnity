@@ -69,21 +69,33 @@ public class UIScript : MonoBehaviour
 
     public void SelectFiltered()
     {
+        SelectFilteredExecute(false);
+    }
+
+    public void SelectFilteredCount()
+    {
+        SelectFilteredExecute(true);
+    }
+
+    private void SelectFilteredExecute(bool includeTotalCount)
+    {
         EasyTableQueryHelper<Highscore> queryHelper = new EasyTableQueryHelper<Highscore>();
-        
 
         string pn = "d";
         var query = queryHelper.Where(x => x.score > 500 || x.playername.StartsWith(pn)).OrderBy(x => x.score);
+
+        if (includeTotalCount)
+            query = query.IncludeTotalCount();
 
         EasyTables.Instance.SelectFiltered<Highscore>(query, x =>
         {
             if (x.Status == CallBackResult.Success)
             {
-                foreach (var item in x.Result)
+                foreach (var item in x.Result.results)
                 {
                     Debug.Log(string.Format("ID is {0},score is {1}", item.id, item.score ));
                 }
-                StatusText.text = "success, found " + x.Result.Count() + " results";
+                StatusText.text = "success, found " + x.Result.count + " results";
             }
             else
             {

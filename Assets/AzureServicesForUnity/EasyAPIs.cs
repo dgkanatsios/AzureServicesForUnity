@@ -11,10 +11,6 @@ namespace AzureServicesForUnity
 {
     public class EasyAPIs : MonoBehaviour
     {
-        void Start()
-        {
-            Instance = this;
-        }
 
 
         public void CallAPI<T>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted)
@@ -32,6 +28,7 @@ namespace AzureServicesForUnity
 
         void Awake()
         {
+            Instance = this;
             Utilities.ValidateForNull(Url);
         }
 

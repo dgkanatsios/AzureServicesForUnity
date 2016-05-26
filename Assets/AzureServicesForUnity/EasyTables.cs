@@ -20,13 +20,10 @@ namespace AzureServicesForUnity
 
         void Awake()
         {
+            Instance = this;
             Utilities.ValidateForNull(Url);
         }
 
-        void Start()
-        {
-            Instance = this;
-        }
 
 
         #region Public methods
@@ -40,7 +37,7 @@ namespace AzureServicesForUnity
             StartCoroutine(InsertInternal(instance, onInsertCompleted));
         }
 
-        public void SelectFiltered<T>(EasyTableQuery<T> query, Action<CallbackResponse<T[]>> onSelectCompleted)
+        public void SelectFiltered<T>(EasyTableQuery<T> query, Action<CallbackResponse<SelectFilteredResult<T>>> onSelectCompleted)
             where T : AzureObjectBase
         {
             Utilities.ValidateForNull(onSelectCompleted); //query can be null
@@ -165,7 +162,8 @@ namespace AzureServicesForUnity
             }
         }
 
-        private IEnumerator SelectFilteredInternal<T>(EasyTableQuery<T> query, Action<CallbackResponse<T[]>> onSelectCompleted)
+        private IEnumerator SelectFilteredInternal<T>(EasyTableQuery<T> query,
+            Action<CallbackResponse<SelectFilteredResult<T>>> onSelectCompleted)
            where T : AzureObjectBase
         {
             string url = GetTablesUrl<T>();
@@ -180,7 +178,7 @@ namespace AzureServicesForUnity
                 yield return www.Send();
                 if (Globals.DebugFlag) Debug.Log(www.responseCode);
 
-                CallbackResponse<T[]> response = new CallbackResponse<T[]>();
+                CallbackResponse<SelectFilteredResult<T>> response = new CallbackResponse<SelectFilteredResult<T>>();
 
                 if (Utilities.IsWWWError(www))
                 {
@@ -190,8 +188,18 @@ namespace AzureServicesForUnity
                 else
                 {
                     response.Status = CallBackResult.Success;
-                    T[] data = Utilities.DeserializeJsonArray<T>(www.downloadHandler.text);
-                    response.Result = data;
+
+                    SelectFilteredResult<T> selectFilteredResult = null;
+                    if (query.RequestTotalCount)
+                        selectFilteredResult = JsonUtility.FromJson<SelectFilteredResult<T>>(www.downloadHandler.text);
+                    else
+                    {
+                        selectFilteredResult = new SelectFilteredResult<T>();
+                        T[] data = Utilities.DeserializeJsonArray<T>(www.downloadHandler.text);
+                        selectFilteredResult.results = data;
+                        selectFilteredResult.count = null;
+                    }
+                    response.Result = selectFilteredResult;
                 }
                 onSelectCompleted(response);
             }
