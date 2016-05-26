@@ -7,7 +7,8 @@ Combine the above two paragraphs and you have a small cross platform library tha
 
 ###Current version: 0.0.6 (beta)
 
-For information and usage instructions check https://dgkanatsios.com/2016/04/14/use-azure-services-from-unity/
+For information and usage instructions check https://dgkanatsios.com/2016/04/14/use-azure-services-from-unity/ and the demo scene
+I've made some changes to the API compared to the one in the blog post, update imminent!
 
 ###Changelog
 
