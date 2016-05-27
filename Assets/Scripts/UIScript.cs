@@ -95,7 +95,14 @@ public class UIScript : MonoBehaviour
                 {
                     Debug.Log(string.Format("ID is {0},score is {1}", item.id, item.score ));
                 }
-                StatusText.text = "success, found " + x.Result.count + " results";
+                if (includeTotalCount)
+                {
+                    StatusText.text = string.Format("Brought {0} rows out of {1}", x.Result.results.Count(), x.Result.count);
+                }
+                else
+                {
+                    StatusText.text = string.Format("Brought {0} rows", x.Result.results.Count());
+                }
             }
             else
             {

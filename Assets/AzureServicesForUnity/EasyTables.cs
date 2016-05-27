@@ -197,7 +197,7 @@ namespace AzureServicesForUnity
                         selectFilteredResult = new SelectFilteredResult<T>();
                         T[] data = Utilities.DeserializeJsonArray<T>(www.downloadHandler.text);
                         selectFilteredResult.results = data;
-                        selectFilteredResult.count = null;
+                        selectFilteredResult.count = -1;
                     }
                     response.Result = selectFilteredResult;
                 }
