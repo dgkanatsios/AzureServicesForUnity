@@ -9,7 +9,7 @@ namespace AzureServicesForUnity.Helpers
     public class SelectFilteredResult<T>
     {
         /// <summary>
-        /// If IncludeTotalCount() is not called, it has the value -1. If it is called, it has the value of the total number of rows
+        /// If IncludeTotalCount() is called, it contains the total number of rows. If it is not called, it is -1
         /// </summary>
         public int count;
         public T[] results;
