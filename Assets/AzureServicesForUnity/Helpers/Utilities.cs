@@ -71,6 +71,12 @@ namespace AzureServicesForUnity.Helpers
             response.Exception = ex;
         }
 
+        public static void BuildResponseObjectOnException(CallbackResponse response, Exception ex)
+        {
+            response.Status = CallBackResult.LocalException;
+            response.Exception = ex;
+        }
+
         /// <summary>
         /// Builds and returns a UnityWebRequest object
         /// </summary>

@@ -28,6 +28,7 @@ namespace AzureServicesForUnity.Helpers
         Success,
         Failure,
         DeserializationFailure,
-        NotFound
+        NotFound,
+        LocalException
     }
 }

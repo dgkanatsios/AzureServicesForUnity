@@ -154,7 +154,7 @@ namespace AzureServicesForUnity
                     }
                     catch (Exception ex)
                     {
-                        response.Status = CallBackResult.Failure;
+                        response.Status = CallBackResult.DeserializationFailure;
                         response.Exception = ex;
                     }
                 }
@@ -187,19 +187,33 @@ namespace AzureServicesForUnity
                 }
                 else
                 {
-                    response.Status = CallBackResult.Success;
-
-                    SelectFilteredResult<T> selectFilteredResult = null;
-                    if (query.RequestTotalCount)
-                        selectFilteredResult = JsonUtility.FromJson<SelectFilteredResult<T>>(www.downloadHandler.text);
-                    else
+                    try
                     {
-                        selectFilteredResult = new SelectFilteredResult<T>();
-                        T[] data = Utilities.DeserializeJsonArray<T>(www.downloadHandler.text);
-                        selectFilteredResult.results = data;
-                        selectFilteredResult.count = -1;
+                        response.Status = CallBackResult.Success;
+
+                        //reported issue when fetching many rows
+                        string textResponse = www.downloadHandler.text.Replace("\n", "");
+
+                        //reported issue on OSX
+                        if (textResponse.Trim() == string.Empty)
+                            throw new Exception("downloadHandler is empty");
+
+                        SelectFilteredResult<T> selectFilteredResult = null;
+                        if (query.RequestTotalCount)
+                            selectFilteredResult = JsonUtility.FromJson<SelectFilteredResult<T>>(textResponse);
+                        else
+                        {
+                            selectFilteredResult = new SelectFilteredResult<T>();
+                            T[] data = Utilities.DeserializeJsonArray<T>(www.downloadHandler.text);
+                            selectFilteredResult.results = data;
+                            selectFilteredResult.count = -1;
+                        }
+                        response.Result = selectFilteredResult;
                     }
-                    response.Result = selectFilteredResult;
+                    catch (Exception ex)
+                    {
+                        Utilities.BuildResponseObjectOnException(response, ex);
+                    }
                 }
                 onSelectCompleted(response);
             }
