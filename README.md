@@ -5,6 +5,8 @@ Unity has a great class to do HTTP requests called [UnityWebRequest](http://docs
 
 Combine the above two paragraphs and you have a small cross platform library that allows a Unity game easy access Azure Easy Tables (yes, very easy!).
 
+Sample scene points to a free Azure mobile app, so it can take some time to respond in subsequent requests.
+
 ###Current version: 0.0.8 (beta)
 
 For information and usage instructions check https://dgkanatsios.com/2016/04/14/use-azure-services-from-unity/ and the demo scene
