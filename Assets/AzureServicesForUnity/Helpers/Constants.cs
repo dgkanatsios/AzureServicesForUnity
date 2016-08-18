@@ -21,7 +21,7 @@ namespace AzureServicesForUnity.Helpers
 
         public static readonly string ErrorOccurred = "Error occurred";
 
-        public static readonly string LibraryVersion = "0.0.7";
+        public static readonly string LibraryVersion = "0.0.8";
 
         
     }

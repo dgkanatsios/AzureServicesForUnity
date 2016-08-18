@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.Experimental.Networking;
+using UnityEngine.Networking;
 
 namespace AzureServicesForUnity.Helpers
 {
