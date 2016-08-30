@@ -24,6 +24,25 @@ public class UIScript : MonoBehaviour
         EasyTables.Instance.AuthenticationToken = "";
     }
 
+    public void CallUpdateForAndroid()
+    {
+        EasyAPIs.Instance.CallAPI<Highscore, Highscore>("UpdateHighScore", HttpMethod.Post, response =>
+        {
+            if (response.Status == CallBackResult.Success)
+            {
+                Highscore obj = response.Result;
+                string result = string.Format("new highscore is {0} and name is {1}", obj.score, obj.playername);
+                Debug.Log(result);
+                StatusText.text = result;
+            }
+            else
+            {
+                ShowError(response.Exception.Message);
+            }
+        },
+        new Highscore() { id = "ecca86cb-8e35-47ac-8eef-74dc2ef87faa", playername="Dimitris", score=31 });
+        StatusText.text = "Loading...";
+    }
 
     public void CallAPI()
     {

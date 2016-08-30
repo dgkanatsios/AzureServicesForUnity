@@ -13,11 +13,19 @@ namespace AzureServicesForUnity
     {
 
 
-        public void CallAPI<T>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted)
+        public void CallAPI<T,P>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted, P instance)
             where T : class
+            where P : class
         {
             Utilities.ValidateForNull(apiname, onInvokeAPICompleted);
-            StartCoroutine(CallAPIInternal(apiname, method, onInvokeAPICompleted));
+            StartCoroutine(CallAPIInternal(apiname, method, onInvokeAPICompleted, instance));
+        }
+
+        public void CallAPI<T>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted)
+           where T : class
+        {
+            Utilities.ValidateForNull(apiname, onInvokeAPICompleted);
+            StartCoroutine(CallAPIInternal<T,object>(apiname, method, onInvokeAPICompleted));
         }
 
         public string Url;
@@ -34,11 +42,15 @@ namespace AzureServicesForUnity
 
         
 
-        private IEnumerator CallAPIInternal<T>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted)
+        private IEnumerator CallAPIInternal<T,P>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted, P instance = null)
            where T : class
+           where P : class
         {
+            string json = null;
+            if (instance != null) json = JsonUtility.ToJson(instance);
+
             using (UnityWebRequest www = Utilities.BuildWebRequest(GetApiUrl(apiname),
-                method.ToString(), null, AuthenticationToken))
+                method.ToString(), json, AuthenticationToken))
             {
                 yield return www.Send();
                 if (Globals.DebugFlag) Debug.Log(www.responseCode);
@@ -52,7 +64,6 @@ namespace AzureServicesForUnity
                 {
                     try
                     {
-                        //FromJson method does not do well with single quotes...
                         T returnObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
                         response.Status = CallBackResult.Success;
                         response.Result = returnObject;
