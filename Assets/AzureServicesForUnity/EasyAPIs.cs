@@ -13,7 +13,7 @@ namespace AzureServicesForUnity
     {
 
 
-        public void CallAPI<T,P>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted, P instance)
+        public void CallAPI<T,P>(string apiname, HttpMethod method, Action<CallbackResponse<T[]>> onInvokeAPICompleted, P instance)
             where T : class
             where P : class
         {
@@ -21,7 +21,7 @@ namespace AzureServicesForUnity
             StartCoroutine(CallAPIInternal(apiname, method, onInvokeAPICompleted, instance));
         }
 
-        public void CallAPI<T>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted)
+        public void CallAPI<T>(string apiname, HttpMethod method, Action<CallbackResponse<T[]>> onInvokeAPICompleted)
            where T : class
         {
             Utilities.ValidateForNull(apiname, onInvokeAPICompleted);
@@ -42,7 +42,7 @@ namespace AzureServicesForUnity
 
         
 
-        private IEnumerator CallAPIInternal<T,P>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted, P instance = null)
+        private IEnumerator CallAPIInternal<T,P>(string apiname, HttpMethod method, Action<CallbackResponse<T[]>> onInvokeAPICompleted, P instance = null)
            where T : class
            where P : class
         {
@@ -54,7 +54,7 @@ namespace AzureServicesForUnity
             {
                 yield return www.Send();
                 if (Globals.DebugFlag) Debug.Log(www.responseCode);
-                CallbackResponse<T> response = new CallbackResponse<T>();
+                CallbackResponse<T[]> response = new CallbackResponse<T[]>();
                 if (Utilities.IsWWWError(www))
                 {
                     if (Globals.DebugFlag) Debug.Log(www.error);
@@ -64,7 +64,7 @@ namespace AzureServicesForUnity
                 {
                     try
                     {
-                        T returnObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
+                        T[] returnObject = JsonHelper.GetJsonArray<T>(www.downloadHandler.text);
                         response.Status = CallBackResult.Success;
                         response.Result = returnObject;
                     }

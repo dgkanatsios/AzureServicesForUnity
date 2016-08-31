@@ -30,7 +30,7 @@ public class UIScript : MonoBehaviour
         {
             if (response.Status == CallBackResult.Success)
             {
-                Highscore obj = response.Result;
+                Highscore obj = response.Result[0];
                 string result = string.Format("new highscore is {0} and name is {1}", obj.score, obj.playername);
                 Debug.Log(result);
                 StatusText.text = result;
@@ -40,19 +40,19 @@ public class UIScript : MonoBehaviour
                 ShowError(response.Exception.Message);
             }
         },
-        new Highscore() { id = "ecca86cb-8e35-47ac-8eef-74dc2ef87faa", playername="Dimitris", score=31 });
+        new Highscore() { id = "ecca86cb-8e35-47ac-8eef-74dc2ef87faa", playername="Dimitris", score=33 });
         StatusText.text = "Loading...";
     }
 
     public void CallAPI()
     {
-        //custom message is: response.send(200, "{\"message\": \"hello world\", \"data\": \"15\"}") 
+        //custom message is: response.send(200, "[{\"message\": \"hello world\", \"data\": \"15\"}]") 
         //in hello.js and method is POST
         EasyAPIs.Instance.CallAPI<CustomAPIReturnObject>("Hello", HttpMethod.Post, response =>
          {
              if (response.Status == CallBackResult.Success)
              {
-                 CustomAPIReturnObject obj = response.Result;
+                 CustomAPIReturnObject obj = response.Result[0];
                  string result = string.Format("message is {0} and data is {1}", obj.message, obj.data);
                  Debug.Log(result);
                  StatusText.text = result;
@@ -157,32 +157,42 @@ public class UIScript : MonoBehaviour
 
     public void UpdateSingle()
     {
-        EasyTables.Instance.SelectByID<Highscore>("bbd01bc4-52db-407d-83a4-d8b5422e300f", selectResponse =>
+        //Android disallows PATCH so we can't use the EasyTables solution
+        //instead, we need an Easy API solution
+        if (Application.platform == RuntimePlatform.Android)
         {
-            if (selectResponse.Status == CallBackResult.Success)
+            CallUpdateForAndroid();
+        }
+        else
+        {
+
+            EasyTables.Instance.SelectByID<Highscore>("bbd01bc4-52db-407d-83a4-d8b5422e300f", selectResponse =>
             {
-                Highscore hs = selectResponse.Result;
-                hs.score += 1;
-                EasyTables.Instance.UpdateObject(hs, updateResponse =>
+                if (selectResponse.Status == CallBackResult.Success)
                 {
-                    if (updateResponse.Status == CallBackResult.Success)
+                    Highscore hs = selectResponse.Result;
+                    hs.score += 1;
+                    EasyTables.Instance.UpdateObject(hs, updateResponse =>
                     {
-                        string msg = "object with id " + updateResponse.Result.id + " was updated";
-                        Debug.Log(msg);
-                        StatusText.text = msg;
-                    }
-                    else
-                    {
-                        ShowError(updateResponse.Exception.Message);
-                    }
-                });
-            }
-            else
-            {
-                ShowError(selectResponse.Exception.Message);
-            }
-        });
-        StatusText.text = "Loading...";
+                        if (updateResponse.Status == CallBackResult.Success)
+                        {
+                            string msg = "object with id " + updateResponse.Result.id + " was updated";
+                            Debug.Log(msg);
+                            StatusText.text = msg;
+                        }
+                        else
+                        {
+                            ShowError(updateResponse.Exception.Message);
+                        }
+                    });
+                }
+                else
+                {
+                    ShowError(selectResponse.Exception.Message);
+                }
+            });
+            StatusText.text = "Loading...";
+        }
     }
 
     public void DeleteByID()

@@ -10,39 +10,6 @@ namespace AzureServicesForUnity.Helpers
 {
     public static class Utilities
     {
-        public static T[] DeserializeJsonArray<T>(string json)
-        {
-            json = json.Trim();
-            if (json == "[]")
-                return new T[0]; //just return an empty array
-            else
-            {
-                //string will be of the format "[{...},{...},{...},{...}]"
-
-                if (json[0] != '[' || json[json.Length - 1] != ']')
-                    return null;
-
-                //http://stackoverflow.com/questions/20243621/regular-expression-for-a-json-type-string
-                Match match = Regex.Match(json, "({.*?})");
-
-                List<T> objectInstances = new List<T>();
-
-                while(match.Success)
-                {
-                    try
-                    {
-                        objectInstances.Add(JsonUtility.FromJson<T>(match.Value));
-                    }
-                    catch
-                    {
-                        //if you cannot deserialize a single object contained in the array, suppress
-                    }
-                    match = match.NextMatch();
-                }
-                return objectInstances.ToArray();
-            }
-        }
-
         public static void ValidateForNull(params object[] objects)
         {
             foreach (object obj in objects)
@@ -106,6 +73,23 @@ namespace AzureServicesForUnity.Helpers
                 www.uploadHandler = handler;
             }
             return www;
+        }
+    }
+
+    //http://forum.unity3d.com/threads/how-to-load-an-array-with-jsonutility.375735/#post-2585129
+    public class JsonHelper
+    {
+        public static T[] GetJsonArray<T>(string json)
+        {
+            string newJson = "{ \"array\": " + json + "}";
+            Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(newJson);
+            return wrapper.array;
+        }
+
+        [Serializable]
+        private class Wrapper<T>
+        {
+            public T[] array;
         }
     }
 
