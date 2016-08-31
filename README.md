@@ -7,12 +7,15 @@ Combine the above two paragraphs and you have a small cross platform library tha
 
 Sample scene points to a free Azure mobile app, so it can take some time to respond in subsequent requests.
 
-###Current version: 0.0.8 (beta)
+###Current version: 0.0.9 (beta)
 
 For information and usage instructions check https://dgkanatsios.com/2016/04/14/use-azure-services-from-unity/ and the demo scene
 I've made some changes to the API compared to the one in the blog post, update imminent!
 
 ###Changelog
+
+###version 0.0.9
+- Fix for use on Android, check details here: https://github.com/dgkanatsios/AzureServicesForUnity/issues/4
 
 ###version 0.0.8 (18/8/2016)
 - Updated for use with Unity 5.4 (removed "Experimental" from UnityWebRequest namespace)
