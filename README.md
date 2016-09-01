@@ -9,8 +9,9 @@ Sample scene points to a free Azure mobile app, so it can take some time to resp
 
 ###Current version: 0.0.9 (beta)
 
-For information and usage instructions check [here](https://dgkanatsios.com/2016/04/14/use-azure-services-from-unity/) and the demo scene
-I've made some changes to the API compared to the one in the blog post, check [here](https://dgkanatsios.com/2016/09/01/an-update-to-azure-services-for-unity-library/)!
+For information and usage instructions check [here](https://dgkanatsios.com/2016/04/14/use-azure-services-from-unity/) and the demo scene included in the source code.
+
+I've also made some changes to the API compared to the one in the blog post, check [here](https://dgkanatsios.com/2016/09/01/an-update-to-azure-services-for-unity-library/)!
 
 ###Changelog
 
