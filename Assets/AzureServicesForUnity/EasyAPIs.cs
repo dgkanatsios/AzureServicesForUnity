@@ -12,20 +12,66 @@ namespace AzureServicesForUnity
     public class EasyAPIs : MonoBehaviour
     {
 
-
-        public void CallAPI<T,P>(string apiname, HttpMethod method, Action<CallbackResponse<T[]>> onInvokeAPICompleted, P instance)
+        /// <summary>
+        /// Calls Easy API and returns multiple results in array
+        /// </summary>
+        /// <typeparam name="T">Typeof return object</typeparam>
+        /// <typeparam name="P">Typeof object to send to the server</typeparam>
+        /// <param name="apiname">Name of the API</param>
+        /// <param name="method">HTTP verb</param>
+        /// <param name="onInvokeAPICompleted">Callback</param>
+        /// <param name="instance">Instance of object to send to the server</param>
+        public void CallAPIMultiple<T, P>(string apiname, HttpMethod method, Action<CallbackResponse<T[]>> onInvokeAPICompleted, P instance)
             where T : class
             where P : class
         {
             Utilities.ValidateForNull(apiname, onInvokeAPICompleted);
-            StartCoroutine(CallAPIInternal(apiname, method, onInvokeAPICompleted, instance));
+            StartCoroutine(CallAPIInternalMultiple(apiname, method, onInvokeAPICompleted, instance));
         }
 
-        public void CallAPI<T>(string apiname, HttpMethod method, Action<CallbackResponse<T[]>> onInvokeAPICompleted)
+        /// <summary>
+        /// Calls Easy API and returns multiple results in array
+        /// </summary>
+        /// <typeparam name="T">Typeof return object</typeparam>
+        /// <param name="apiname">Name of the API</param>
+        /// <param name="method">HTTP verb</param>
+        /// <param name="onInvokeAPICompleted">Callback</param>
+        public void CallAPIMultiple<T>(string apiname, HttpMethod method, Action<CallbackResponse<T[]>> onInvokeAPICompleted)
+        where T : class
+        {
+            Utilities.ValidateForNull(apiname, onInvokeAPICompleted);
+            StartCoroutine(CallAPIInternalMultiple<T, object>(apiname, method, onInvokeAPICompleted));
+        }
+
+        /// <summary>
+        /// Calls Easy API and returns single result
+        /// </summary>
+        /// <typeparam name="T">Typeof return object</typeparam>
+        /// <typeparam name="P">Typeof object to send to the server</typeparam>
+        /// <param name="apiname">Name of the API</param>
+        /// <param name="method">HTTP verb</param>
+        /// <param name="onInvokeAPICompleted">Callback</param>
+        /// <param name="instance">Instance of object to send to the server</param>
+        public void CallAPISingle<T, P>(string apiname, HttpMethod method, Action<CallbackResponse<T[]>> onInvokeAPICompleted, P instance)
+        where T : class
+        where P : class
+        {
+            Utilities.ValidateForNull(apiname, onInvokeAPICompleted);
+            StartCoroutine(CallAPIInternalSingle(apiname, method, onInvokeAPICompleted, instance));
+        }
+
+        /// <summary>
+        /// Calls Easy API and returns single result
+        /// </summary>
+        /// <typeparam name="T">Typeof return object</typeparam>
+        /// <param name="apiname">Name of the API</param>
+        /// <param name="method">HTTP verb</param>
+        /// <param name="onInvokeAPICompleted">Callback</param>
+        public void CallAPISingle<T>(string apiname, HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted)
            where T : class
         {
             Utilities.ValidateForNull(apiname, onInvokeAPICompleted);
-            StartCoroutine(CallAPIInternal<T,object>(apiname, method, onInvokeAPICompleted));
+            StartCoroutine(CallAPIInternalSingle<T, object>(apiname, method, onInvokeAPICompleted));
         }
 
         public string Url;
@@ -40,9 +86,46 @@ namespace AzureServicesForUnity
             Utilities.ValidateForNull(Url);
         }
 
-        
+        private IEnumerator CallAPIInternalSingle<T, P>(string apiname,
+            HttpMethod method, Action<CallbackResponse<T>> onInvokeAPICompleted, P instance = null)
+           where T : class
+           where P : class
+        {
+            string json = null;
+            if (instance != null) json = JsonUtility.ToJson(instance);
 
-        private IEnumerator CallAPIInternal<T,P>(string apiname, HttpMethod method, Action<CallbackResponse<T[]>> onInvokeAPICompleted, P instance = null)
+            using (UnityWebRequest www = Utilities.BuildWebRequest(GetApiUrl(apiname),
+                method.ToString(), json, AuthenticationToken))
+            {
+                yield return www.Send();
+                if (Globals.DebugFlag) Debug.Log(www.responseCode);
+                CallbackResponse<T> response = new CallbackResponse<T>();
+                if (Utilities.IsWWWError(www))
+                {
+                    if (Globals.DebugFlag) Debug.Log(www.error);
+                    Utilities.BuildResponseObjectOnFailure(response, www);
+                }
+                else if (www.downloadHandler != null)  //all OK
+                {
+                    try
+                    {
+                        T returnObject;
+                        returnObject = JsonUtility.FromJson<T>(www.downloadHandler.text);
+                        response.Status = CallBackResult.Success;
+                        response.Result = returnObject;
+                    }
+                    catch (Exception ex)
+                    {
+                        response.Status = CallBackResult.DeserializationFailure;
+                        response.Exception = ex;
+                    }
+                }
+                onInvokeAPICompleted(response);
+            }
+        }
+
+        private IEnumerator CallAPIInternalMultiple<T, P>(string apiname,
+            HttpMethod method, Action<CallbackResponse<T[]>> onInvokeAPICompleted, P instance = null)
            where T : class
            where P : class
         {
@@ -64,7 +147,8 @@ namespace AzureServicesForUnity
                 {
                     try
                     {
-                        T[] returnObject = JsonHelper.GetJsonArray<T>(www.downloadHandler.text);
+                        T[] returnObject;
+                        returnObject = JsonHelper.GetJsonArray<T>(www.downloadHandler.text);
                         response.Status = CallBackResult.Success;
                         response.Result = returnObject;
                     }
@@ -75,9 +159,9 @@ namespace AzureServicesForUnity
                     }
                 }
                 onInvokeAPICompleted(response);
-
             }
         }
+
 
 
         private string GetApiUrl(string apiname)

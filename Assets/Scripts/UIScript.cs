@@ -22,11 +22,22 @@ public class UIScript : MonoBehaviour
         //e.g. for facebook, check the Unity Facebook SDK at https://developers.facebook.com/docs/unity
         EasyAPIs.Instance.AuthenticationToken = "";
         EasyTables.Instance.AuthenticationToken = "";
+
+        //check here for more information regarding authentication and authorization in Azure App Service
+        //https://azure.microsoft.com/en-us/documentation/articles/app-service-authentication-overview/
     }
+
+    private void ShowError(string error)
+    {
+        Debug.Log(error);
+        StatusText.text = "Error: " + error;
+    }
+
+    #region Easy APIs
 
     public void CallUpdateForAndroid()
     {
-        EasyAPIs.Instance.CallAPI<Highscore, Highscore>("UpdateHighScore", HttpMethod.Post, response =>
+        EasyAPIs.Instance.CallAPISingle<Highscore, Highscore>("UpdateHighScore", HttpMethod.Post, response =>
         {
             if (response.Status == CallBackResult.Success)
             {
@@ -44,15 +55,30 @@ public class UIScript : MonoBehaviour
         StatusText.text = "Loading...";
     }
 
-    public void CallAPI()
+    /*
+     On hello.js, we have this code
+     module.exports = {
+    "post": function (req, res, next) {
+        
+    res.send(200, "[{\"message\": \"hello world\", \"data\": \"15\"},{\"message\": \"hello world2\", \"data\": \"16\"}]"); 
+    },
+    
+    "get": function (req, res, next) {
+        
+    res.send(200, "{\"message\": \"hello world\", \"data\": \"15\"}"); 
+    }
+};
+         */
+
+    public void CallAPISingle()
     {
-        //custom message is: response.send(200, "[{\"message\": \"hello world\", \"data\": \"15\"}]") 
-        //in hello.js and method is POST
-        EasyAPIs.Instance.CallAPI<CustomAPIReturnObject>("Hello", HttpMethod.Post, response =>
+        //custom message is: response.send(200, "{\"message\": \"hello world\", \"data\": \"15\"}") 
+        //in hello.js and method is GET
+        EasyAPIs.Instance.CallAPISingle<CustomAPIReturnObject>("Hello", HttpMethod.Get, response =>
          {
              if (response.Status == CallBackResult.Success)
              {
-                 CustomAPIReturnObject obj = response.Result[0];
+                 CustomAPIReturnObject obj = response.Result;
                  string result = string.Format("message is {0} and data is {1}", obj.message, obj.data);
                  Debug.Log(result);
                  StatusText.text = result;
@@ -64,6 +90,34 @@ public class UIScript : MonoBehaviour
          });
         StatusText.text = "Loading...";
     }
+
+    public void CallAPIMultiple()
+    {
+        //custom message is: response.send(200, "[{\"message\": \"hello world\", \"data\": \"15\"}]") 
+        //in hello.js and method is POST
+        EasyAPIs.Instance.CallAPIMultiple<CustomAPIReturnObject>("Hello", HttpMethod.Post, response =>
+        {
+            if (response.Status == CallBackResult.Success)
+            {
+                StatusText.text = "";
+                foreach (CustomAPIReturnObject obj in response.Result)
+                {
+                    string result = string.Format("message is {0} and data is {1}", obj.message, obj.data);
+                    Debug.Log(result);
+                    StatusText.text += " " + result;
+                }
+              }
+            else
+            {
+                ShowError(response.Exception.Message);
+            }
+        });
+        StatusText.text = "Loading...";
+    }
+
+    #endregion
+
+    #region Easy Tables
 
     public void Insert()
     {
@@ -131,11 +185,7 @@ public class UIScript : MonoBehaviour
         StatusText.text = "Loading...";
     }
 
-    private void ShowError(string error)
-    {
-        Debug.Log(error);
-        StatusText.text = "Error: " + error;
-    }
+
 
     public void SelectByID()
     {
@@ -225,7 +275,10 @@ public class UIScript : MonoBehaviour
     }
 }
 
+#endregion
 
+
+//Helper class for Easy Tables
 [Serializable()]
 public class Highscore : AzureObjectBase
 {
@@ -233,6 +286,7 @@ public class Highscore : AzureObjectBase
     public string playername;
 }
 
+//Helper class for Easy APIs
 [Serializable()]
 public class CustomAPIReturnObject
 {
