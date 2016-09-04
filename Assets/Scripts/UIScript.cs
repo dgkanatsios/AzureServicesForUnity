@@ -78,7 +78,8 @@ public class UIScript : MonoBehaviour
          {
              if (response.Status == CallBackResult.Success)
              {
-                 CustomAPIReturnObject obj = response.Result;
+                 //CallAPISingle returns array of one object
+                 CustomAPIReturnObject obj = response.Result[0];
                  string result = string.Format("message is {0} and data is {1}", obj.message, obj.data);
                  Debug.Log(result);
                  StatusText.text = result;
