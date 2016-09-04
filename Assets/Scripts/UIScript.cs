@@ -37,7 +37,7 @@ public class UIScript : MonoBehaviour
 
     public void CallUpdateForAndroid()
     {
-        EasyAPIs.Instance.CallAPISingle<Highscore, Highscore>("UpdateHighScore", HttpMethod.Post, response =>
+        EasyAPIs.Instance.CallAPIMultiple<Highscore, Highscore>("UpdateHighScore", HttpMethod.Post, response =>
         {
             if (response.Status == CallBackResult.Success)
             {
