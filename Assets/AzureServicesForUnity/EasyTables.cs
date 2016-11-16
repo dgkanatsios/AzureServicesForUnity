@@ -1,10 +1,8 @@
-﻿using AzureServicesForUnity.Helpers;
-using AzureServicesForUnity.QueryHelpers.Linq;
+﻿using AzureServicesForUnity.AppService;
+using AzureServicesForUnity.AppService.QueryHelpers.Linq;
+using AzureServicesForUnity.Shared;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -31,35 +29,35 @@ namespace AzureServicesForUnity
 
 
         public void Insert<T>(T instance, Action<CallbackResponse<T>> onInsertCompleted)
-            where T : AzureObjectBase
+            where T : AppServiceObjectBase
         {
             Utilities.ValidateForNull(instance, onInsertCompleted);
             StartCoroutine(InsertInternal(instance, onInsertCompleted));
         }
 
         public void SelectFiltered<T>(EasyTableQuery<T> query, Action<CallbackResponse<SelectFilteredResult<T>>> onSelectCompleted)
-            where T : AzureObjectBase
+            where T : AppServiceObjectBase
         {
             Utilities.ValidateForNull(onSelectCompleted); //query can be null
             StartCoroutine(SelectFilteredInternal(query, onSelectCompleted));
         }
 
         public void SelectByID<T>(string id, Action<CallbackResponse<T>> onSelectByIDCompleted)
-            where T : AzureObjectBase
+            where T : AppServiceObjectBase
         {
             Utilities.ValidateForNull(id, onSelectByIDCompleted);
             StartCoroutine(SelectByIDInternal<T>(id, onSelectByIDCompleted));
         }
 
         public void UpdateObject<T>(T instance, Action<CallbackResponse<T>> onUpdateCompleted)
-            where T : AzureObjectBase
+            where T : AppServiceObjectBase
         {
             Utilities.ValidateForNull(instance);
             StartCoroutine(UpdateInternal(instance, onUpdateCompleted));
         }
 
         public void DeleteByID<T>(string id, Action<CallbackResponse> onDeleteCompleted)
-            where T : AzureObjectBase
+            where T : AppServiceObjectBase
         {
             Utilities.ValidateForNull(id, onDeleteCompleted);
             StartCoroutine(DeleteByIDInternal<Highscore>(id, onDeleteCompleted));
@@ -68,10 +66,10 @@ namespace AzureServicesForUnity
         #endregion
 
         private IEnumerator DeleteByIDInternal<T>(string id, Action<CallbackResponse> onDeleteCompleted)
-            where T : AzureObjectBase
+            where T : AppServiceObjectBase
         {
-            using (UnityWebRequest www = Utilities.BuildWebRequest
-                (GetTablesUrl<T>() + "/" + WWW.EscapeURL(id), HttpMethod.Delete.ToString(), null, AuthenticationToken))
+            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest
+                (GetEasyTablesUrl<T>() + "/" + WWW.EscapeURL(id), HttpMethod.Delete.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
                 if (Globals.DebugFlag) Debug.Log(www.responseCode);
@@ -92,11 +90,11 @@ namespace AzureServicesForUnity
         }
 
         private IEnumerator InsertInternal<T>(T instance, Action<CallbackResponse<T>> onInsertCompleted)
-          where T : AzureObjectBase
+          where T : AppServiceObjectBase
         {
             string json = JsonUtility.ToJson(instance);
 
-            using (UnityWebRequest www = Utilities.BuildWebRequest(GetTablesUrl<T>(),
+            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest(GetEasyTablesUrl<T>(),
                 HttpMethod.Post.ToString(), json, AuthenticationToken))
             {
                 yield return www.Send();
@@ -131,10 +129,10 @@ namespace AzureServicesForUnity
         }
 
         private IEnumerator SelectByIDInternal<T>(string id, Action<CallbackResponse<T>> onSelectByIDCompleted)
-            where T : AzureObjectBase
+            where T : AppServiceObjectBase
         {
-            using (UnityWebRequest www = Utilities.BuildWebRequest
-                (GetTablesUrl<T>() + "/" + WWW.EscapeURL(id), HttpMethod.Get.ToString(), null, AuthenticationToken))
+            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest
+                (GetEasyTablesUrl<T>() + "/" + WWW.EscapeURL(id), HttpMethod.Get.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
                 if (Globals.DebugFlag) Debug.Log(www.responseCode);
@@ -164,15 +162,15 @@ namespace AzureServicesForUnity
 
         private IEnumerator SelectFilteredInternal<T>(EasyTableQuery<T> query,
             Action<CallbackResponse<SelectFilteredResult<T>>> onSelectCompleted)
-           where T : AzureObjectBase
+           where T : AppServiceObjectBase
         {
-            string url = GetTablesUrl<T>();
+            string url = GetEasyTablesUrl<T>();
             if (query != null)
             {
                 url += "?" + query.ToODataString();
             }
             if (Globals.DebugFlag) Debug.Log(url);
-            using (UnityWebRequest www = Utilities.BuildWebRequest(url,
+            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest(url,
                 HttpMethod.Get.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
@@ -220,10 +218,10 @@ namespace AzureServicesForUnity
         }
 
         private IEnumerator UpdateInternal<T>(T instance, Action<CallbackResponse<T>> onUpdateCompleted)
-           where T : AzureObjectBase
+           where T : AppServiceObjectBase
         {
             string json = JsonUtility.ToJson(instance);
-            using (UnityWebRequest www = Utilities.BuildWebRequest(GetTablesUrl<T>(),
+            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest(GetEasyTablesUrl<T>(),
                 HttpMethod.Patch.ToString(), json, AuthenticationToken))
             {
                 yield return www.Send();
@@ -256,7 +254,7 @@ namespace AzureServicesForUnity
 
        
 
-        private string GetTablesUrl<T>()
+        private string GetEasyTablesUrl<T>()
         {
             return string.Format("{0}/tables/{1}", Url, typeof(T).Name);
         }
