@@ -19,7 +19,9 @@ public class StorageUIScript : MonoBehaviour
         Globals.DebugFlag = true;
 
         if (Globals.DebugFlag)
-            Debug.Log("instantiated Azure Services for Unity version " + Constants.LibraryVersion);
+            Debug.Log("instantiated Azure Services for Unity version " + Globals.LibraryVersion);
+
+        TableStorage.Instance.AuthenticationToken ="";
     }
 
     private void ShowError(string error)
@@ -28,9 +30,29 @@ public class StorageUIScript : MonoBehaviour
         StatusText.text = "Error: " + error;
     }
 
+    public void QueryTable()
+    {
+        //Age >= 30 && Age <= 33
+        string query = "$filter=(Age%20ge%2030)%20and%20(Age%20le%2033)&$select=PartitionKey,RowKey,Age,City";
+        TableStorage.Instance.QueryTable<Customer>(query,"people2", queryTableResponse =>
+        {
+            if (queryTableResponse.Status == CallBackResult.Success)
+            {
+                string result = "QueryTable completed";
+                Debug.Log(result);
+                StatusText.text = result;
+            }
+            else
+            {
+                ShowError(queryTableResponse.Exception.Message);
+            }
+        });
+        StatusText.text = "Loading...";
+    }
+
     public void CreateTable()
     {
-        TableStorage.Instance.CreateTable("people2", createTableResponse =>
+        TableStorage.Instance.CreateTable("people3", createTableResponse =>
         {
             if (createTableResponse.Status == CallBackResult.Success)
             {
@@ -67,12 +89,12 @@ public class StorageUIScript : MonoBehaviour
     public void InsertEntity()
     {
         Customer cust = new Customer();
-        cust.PartitionKey = "Gkanatsios";
-        cust.RowKey = "Dimitris";
-        cust.Age = 32;
-        cust.City = "Athens";
+        cust.PartitionKey = "Gkanatsios2";
+        cust.RowKey = "Dimitris2";
+        cust.Age = 33;
+        cust.City = "Athens2";
 
-        TableStorage.Instance.InsertEntity<Customer>(cust, "people4", insertEntityResponse =>
+        TableStorage.Instance.InsertEntity<Customer>(cust, "people2", insertEntityResponse =>
         {
             if (insertEntityResponse.Status == CallBackResult.Success)
             {

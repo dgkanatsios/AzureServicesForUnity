@@ -1,4 +1,5 @@
 ﻿using AzureServicesForUnity.AppService;
+using AzureServicesForUnity.Shared;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -17,14 +18,13 @@ namespace AzureServicesForUnity.Storage
         public static string XMSDATENAME = "x-ms-date";
         public static string AuthorizationHeaderName = "Authorization";
 
-        static string AccessKey = "PLhlIxlZZBAw1n8xGH8Rplho7s/MfFH9HCFrC1DTA6kkgriGtBgI8BHAqNv0CeQTLQ4nOXzyO8fDV5oXyYl16w==";
-
+        
         public static UnityWebRequest BuildStorageWebRequest(string url,  string method, string accountName, string json)
         {
             UnityWebRequest www = new UnityWebRequest(url, method);
 
-            www.SetRequestHeader(Constants.Accept, AcceptMinimalMetadata);
-            www.SetRequestHeader(Constants.Content_Type, Constants.ApplicationJson);
+            www.SetRequestHeader(Globals.Accept, AcceptMinimalMetadata);
+            www.SetRequestHeader(Globals.Content_Type, Globals.ApplicationJson);
 
             www.SetRequestHeader("MaxDataServiceVersion", "3.0;NetFx");
 
@@ -35,7 +35,7 @@ namespace AzureServicesForUnity.Storage
             string message = CanonicalizeHttpRequest(www, accountName);
 
 
-            byte[] KeyValue = Convert.FromBase64String(AccessKey);
+            byte[] KeyValue = Convert.FromBase64String(TableStorage.Instance.AuthenticationToken);
             string signature = ComputeHmac256(KeyValue, message);
 
             www.SetRequestHeader(AuthorizationHeaderName, GetAuthorization(accountName, signature));
@@ -47,7 +47,7 @@ namespace AzureServicesForUnity.Storage
             {
                 byte[] payload = Encoding.UTF8.GetBytes(json);
                 UploadHandler handler = new UploadHandlerRaw(payload);
-                handler.contentType = Constants.ApplicationJson;
+                handler.contentType = Globals.ApplicationJson;
                 www.uploadHandler = handler;
             }
             return www;

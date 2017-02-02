@@ -39,7 +39,7 @@ namespace AzureServicesForUnity.Shared
             if (errorMessage == null && www.downloadHandler != null && !string.IsNullOrEmpty(www.downloadHandler.text))
                 errorMessage = www.downloadHandler.text;
             else
-                errorMessage = Constants.ErrorOccurred; 
+                errorMessage = Constants.ErrorOccurred;
 
             Exception ex = new Exception(errorMessage);
             response.Exception = ex;
@@ -63,8 +63,8 @@ namespace AzureServicesForUnity.Shared
         {
             UnityWebRequest www = new UnityWebRequest(url, method);
 
-            www.SetRequestHeader(Constants.Accept, Constants.ApplicationJson);
-            www.SetRequestHeader(Constants.Content_Type, Constants.ApplicationJson);
+            www.SetRequestHeader(Globals.Accept, Globals.ApplicationJson);
+            www.SetRequestHeader(Globals.Content_Type, Globals.ApplicationJson);
             www.SetRequestHeader(Constants.ZumoString, Constants.ZumoVersion);
 
             if (!string.IsNullOrEmpty(authenticationToken))
@@ -76,7 +76,7 @@ namespace AzureServicesForUnity.Shared
             {
                 byte[] payload = Encoding.UTF8.GetBytes(json);
                 UploadHandler handler = new UploadHandlerRaw(payload);
-                handler.contentType = Constants.ApplicationJson;
+                handler.contentType = Globals.ApplicationJson;
                 www.uploadHandler = handler;
             }
             return www;
@@ -97,6 +97,18 @@ namespace AzureServicesForUnity.Shared
         private class Wrapper<T>
         {
             public T[] array;
+        }
+
+        [Serializable]
+        private class TableStorageResult<T>
+        {
+            public T[] value;
+        }
+
+        public static T[] GetJsonArrayFromTableStorage<T>(string json)
+        {
+            TableStorageResult<T> result = JsonUtility.FromJson<TableStorageResult<T>>(json);
+            return result.value;
         }
     }
 

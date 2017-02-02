@@ -25,6 +25,15 @@ namespace AzureServicesForUnity
         private string Url;
         public string AccountName = "unitystorage2";
 
+        public void QueryTable<T>(string query, string tableName, Action<CallbackResponse<T[]>> onQueryTableCompleted)
+            where T : TableEntity
+        {
+            Utilities.ValidateForNull(query, tableName, onQueryTableCompleted);
+            StartCoroutine(QueryTableInternal(query, tableName, onQueryTableCompleted));
+        }
+
+    
+
         public void CreateTable(string tableName, Action<CallbackResponse> onCreateTableCompleted)
         {
             StartCoroutine(CreateTableInternal(tableName, onCreateTableCompleted));
@@ -48,7 +57,7 @@ namespace AzureServicesForUnity
             string url = string.Format("{0}{1}()", Url, tableName);
 
             string json = JsonUtility.ToJson(instance);
-            using (UnityWebRequest www = 
+            using (UnityWebRequest www =
                 StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Post.ToString(), AccountName, json))
             {
                 yield return www.Send();
@@ -65,10 +74,10 @@ namespace AzureServicesForUnity
                 else if (www.downloadHandler != null)  //all OK
                 {
                     //let's get the header for the new object that was created
-                   
-                        string dataServiceId = www.GetResponseHeader("Location");
-                        if (Globals.DebugFlag) Debug.Log("new object ID is " + dataServiceId);
-                        response.Status = CallBackResult.Success;
+
+                    string dataServiceId = www.GetResponseHeader("Location");
+                    if (Globals.DebugFlag) Debug.Log("new object ID is " + dataServiceId);
+                    response.Status = CallBackResult.Success;
                 }
                 onInsertCompleted(response);
             }
@@ -76,7 +85,7 @@ namespace AzureServicesForUnity
 
         public IEnumerator DeleteTableInternal(string tableName, Action<CallbackResponse> onCreateTableCompleted)
         {
-            string url = string.Format("{0}Tables('{1}')",Url,tableName);
+            string url = string.Format("{0}Tables('{1}')", Url, tableName);
 
             using (UnityWebRequest www = StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Delete.ToString(), AccountName, string.Empty))
 
@@ -103,7 +112,7 @@ namespace AzureServicesForUnity
         {
             string url = Url + "Tables()";
 
-            string json = string.Format("{\"TableName\":\"{0}\"}", tableName);
+            string json = string.Format("{{\"TableName\":\"{0}\"}}", tableName);
             using (UnityWebRequest www = StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Post.ToString(), AccountName, json))
 
             {
@@ -125,7 +134,42 @@ namespace AzureServicesForUnity
             }
         }
 
+        private IEnumerator QueryTableInternal<T>(string query, string tableName, Action<CallbackResponse<T[]>> onQueryTableCompleted)
+        where T : TableEntity
+        {
+            string url = string.Format("{0}{1}()?{2}", Url, tableName, query);
 
+
+            using (UnityWebRequest www =
+                StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Get.ToString(), AccountName, string.Empty))
+            {
+                yield return www.Send();
+                if (Globals.DebugFlag) Debug.Log(www.responseCode);
+
+                CallbackResponse<T[]> response = new CallbackResponse<T[]>();
+
+                if (Utilities.IsWWWError(www))
+                {
+                    if (Globals.DebugFlag) Debug.Log(www.error);
+                    Utilities.BuildResponseObjectOnFailure(response, www);
+                }
+
+                else if (www.downloadHandler != null)  //all OK
+                {
+                    //let's get the header for the new object that was created
+
+                    T[] data = JsonHelper.GetJsonArrayFromTableStorage<T>(www.downloadHandler.text);
+                    if (Globals.DebugFlag) Debug.Log("Received " + data.Length + " objects");
+
+                    foreach (var item in data)
+                    {
+                        Debug.Log(string.Format("Item with PartitionKey {0} and RowKey {1}", item.PartitionKey, item.RowKey));
+                    }
+                    response.Status = CallBackResult.Success;
+                }
+                onQueryTableCompleted(response);
+            }
+        }
     }
 
 }
