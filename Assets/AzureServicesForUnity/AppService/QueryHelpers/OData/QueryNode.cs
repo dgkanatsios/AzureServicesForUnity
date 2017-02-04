@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.OData
+namespace AzureServicesForUnity.Shared.QueryHelpers.OData
 {
     /// <summary>
     /// Base class for all query nodes.

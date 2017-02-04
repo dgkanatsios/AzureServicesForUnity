@@ -1,4 +1,4 @@
-﻿using AzureServicesForUnity.AppService.QueryHelpers.Linq;
+﻿using AzureServicesForUnity.Shared.QueryHelpers.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;

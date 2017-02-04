@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.OData
+namespace AzureServicesForUnity.Shared.QueryHelpers.OData
 {
     /// <summary>
     /// Node representing an access to a member value.

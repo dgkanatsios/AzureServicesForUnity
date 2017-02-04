@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.OData
+namespace AzureServicesForUnity.Shared.QueryHelpers.OData
 {
     /// <summary>
     /// Enumeration of binary operators.

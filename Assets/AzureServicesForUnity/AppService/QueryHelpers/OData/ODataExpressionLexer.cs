@@ -2,10 +2,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-using AzureServicesForUnity.AppService.QueryHelpers.Other;
+using AzureServicesForUnity.Shared.QueryHelpers.Other;
 using System;
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.OData
+namespace AzureServicesForUnity.Shared.QueryHelpers.OData
 {
     internal sealed class ODataExpressionLexer
     {

@@ -2,8 +2,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-using AzureServicesForUnity.AppService.QueryHelpers.OData;
-using AzureServicesForUnity.AppService.QueryHelpers.Other;
+using AzureServicesForUnity.Shared.QueryHelpers.OData;
+using AzureServicesForUnity.Shared.QueryHelpers.Other;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +13,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.Linq
+namespace AzureServicesForUnity.Shared.QueryHelpers.Linq
 {
     /// <summary>
     /// Compiles a LINQ expression tree into a

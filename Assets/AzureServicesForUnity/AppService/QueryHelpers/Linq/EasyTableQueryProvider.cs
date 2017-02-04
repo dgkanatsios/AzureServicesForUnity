@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-using AzureServicesForUnity.AppService.QueryHelpers.Other;
+using AzureServicesForUnity.Shared.QueryHelpers.Other;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,7 +10,7 @@ using System.Linq;
 
 
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.Linq
+namespace AzureServicesForUnity.Shared.QueryHelpers.Linq
 {
     public class EasyTableQueryProvider
     {

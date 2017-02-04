@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-using AzureServicesForUnity.AppService.QueryHelpers.OData;
+using AzureServicesForUnity.Shared.QueryHelpers.OData;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,7 +10,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.Other
+namespace AzureServicesForUnity.Shared.QueryHelpers.Other
 {
     /// <summary>
     /// Represents the structural elements of a Mobile Services query over the

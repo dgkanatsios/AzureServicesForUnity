@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using AzureServicesForUnity.AppService;
+using AzureServicesForUnity.Shared;
 using UnityEngine.Networking;
 using AzureServicesForUnity.Storage;
 using System;
@@ -34,9 +34,9 @@ namespace AzureServicesForUnity
 
     
 
-        public void CreateTable(string tableName, Action<CallbackResponse> onCreateTableCompleted)
+        public void CreateTableIfNotExists(string tableName, Action<CallbackResponse> onCreateTableCompleted)
         {
-            StartCoroutine(CreateTableInternal(tableName, onCreateTableCompleted));
+            StartCoroutine(CreateTableIfNotExistsInternal(tableName, onCreateTableCompleted));
         }
 
         public void DeleteTable(string tableName, Action<CallbackResponse> onDeleteTableCompleted)
@@ -108,7 +108,7 @@ namespace AzureServicesForUnity
             }
         }
 
-        public IEnumerator CreateTableInternal(string tableName, Action<CallbackResponse> onCreateTableCompleted)
+        public IEnumerator CreateTableIfNotExistsInternal(string tableName, Action<CallbackResponse> onCreateTableCompleted)
         {
             string url = Url + "Tables()";
 

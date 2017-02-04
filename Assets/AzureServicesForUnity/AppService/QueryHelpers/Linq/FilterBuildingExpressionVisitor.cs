@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-using AzureServicesForUnity.AppService.QueryHelpers.OData;
+using AzureServicesForUnity.Shared.QueryHelpers.OData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ using System.Reflection;
 using System.Text;
 
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.Linq
+namespace AzureServicesForUnity.Shared.QueryHelpers.Linq
 {
 
     /// <summary>

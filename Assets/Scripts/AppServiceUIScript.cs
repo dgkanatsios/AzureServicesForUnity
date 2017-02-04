@@ -2,10 +2,10 @@
 using System.Collections;
 using System;
 using AzureServicesForUnity;
-using AzureServicesForUnity.AppService.QueryHelpers.Other;
+using AzureServicesForUnity.Shared.QueryHelpers.Other;
 using System.Linq;
 using UnityEngine.UI;
-using AzureServicesForUnity.AppService;
+using AzureServicesForUnity.Shared;
 using AzureServicesForUnity.Shared;
 
 public class AppServiceUIScript : MonoBehaviour

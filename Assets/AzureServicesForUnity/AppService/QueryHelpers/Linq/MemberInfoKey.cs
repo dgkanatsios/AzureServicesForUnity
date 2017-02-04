@@ -8,7 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.Linq
+namespace AzureServicesForUnity.Shared.QueryHelpers.Linq
 {
     /// <summary>
     ///  Encapsulates information about a class member that can be used as a key

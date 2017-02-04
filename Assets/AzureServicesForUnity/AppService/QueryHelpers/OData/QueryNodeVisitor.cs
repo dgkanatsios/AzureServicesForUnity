@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.OData
+namespace AzureServicesForUnity.Shared.QueryHelpers.OData
 {
     /// <summary>
     /// Visitor interface for walking the QueryNode Tree.

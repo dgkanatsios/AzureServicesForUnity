@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.Other
+namespace AzureServicesForUnity.Shared.QueryHelpers.Other
 {
     /// <summary>
     /// Exception type representing exceptions in parsing of OData queries.

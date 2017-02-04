@@ -1,4 +1,4 @@
-﻿using AzureServicesForUnity.AppService;
+﻿using AzureServicesForUnity.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +32,8 @@ namespace AzureServicesForUnity.Shared
         {
             if (www.responseCode == 404L)
                 response.Status = CallBackResult.NotFound;
+            else if (www.responseCode == 409L)
+                response.Status = CallBackResult.ResourceExists;
             else
                 response.Status = CallBackResult.Failure;
 

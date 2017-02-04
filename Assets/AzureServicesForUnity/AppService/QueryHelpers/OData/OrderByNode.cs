@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.OData
+namespace AzureServicesForUnity.Shared.QueryHelpers.OData
 {
     /// <summary>
     /// Represents the result of parsing the $orderby query option.

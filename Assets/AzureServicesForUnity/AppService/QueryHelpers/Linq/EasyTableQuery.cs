@@ -6,7 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.Linq
+namespace AzureServicesForUnity.Shared.QueryHelpers.Linq
 {
     public class EasyTableQuery<T> 
     {

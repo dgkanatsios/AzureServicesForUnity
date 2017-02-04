@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AzureServicesForUnity.AppService
+namespace AzureServicesForUnity.Shared
 {
     /// <summary>
     /// Holds the response status and possible (hope not!) exception instance
@@ -29,6 +29,7 @@ namespace AzureServicesForUnity.AppService
         Failure,
         DeserializationFailure,
         NotFound,
-        LocalException
+        LocalException,
+        ResourceExists
     }
 }

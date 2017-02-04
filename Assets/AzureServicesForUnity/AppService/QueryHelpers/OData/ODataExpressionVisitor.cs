@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.OData
+namespace AzureServicesForUnity.Shared.QueryHelpers.OData
 {
     internal class ODataExpressionVisitor : QueryNodeVisitor<QueryNode>
     {

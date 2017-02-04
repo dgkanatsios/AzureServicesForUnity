@@ -2,10 +2,10 @@
 using System.Collections;
 using System;
 using AzureServicesForUnity;
-using AzureServicesForUnity.AppService.QueryHelpers.Other;
+using AzureServicesForUnity.Shared.QueryHelpers.Other;
 using System.Linq;
 using UnityEngine.UI;
-using AzureServicesForUnity.AppService;
+using AzureServicesForUnity.Shared;
 using AzureServicesForUnity.Storage;
 using AzureServicesForUnity.Shared;
 
@@ -21,7 +21,7 @@ public class StorageUIScript : MonoBehaviour
         if (Globals.DebugFlag)
             Debug.Log("instantiated Azure Services for Unity version " + Globals.LibraryVersion);
 
-        TableStorage.Instance.AuthenticationToken ="";
+        TableStorage.Instance.AuthenticationToken = "CxKQjfU47L22tk8GL7fnFVX9qGunZQkNXaW/OmrFXfIGnifoNxWxsd9HaZ6a5ZnDs4UQngqFRsGH0qEIwBve1w==";
     }
 
     private void ShowError(string error)
@@ -52,7 +52,7 @@ public class StorageUIScript : MonoBehaviour
 
     public void CreateTable()
     {
-        TableStorage.Instance.CreateTable("people3", createTableResponse =>
+        TableStorage.Instance.CreateTableIfNotExists("people3", createTableResponse =>
         {
             if (createTableResponse.Status == CallBackResult.Success)
             {
@@ -60,6 +60,7 @@ public class StorageUIScript : MonoBehaviour
                 Debug.Log(result);
                 StatusText.text = result;
             }
+            //you could also check if CallBackResult.ResourceExists
             else
             {
                 ShowError(createTableResponse.Exception.Message);

@@ -1,5 +1,5 @@
-﻿using AzureServicesForUnity.AppService;
-using AzureServicesForUnity.AppService.QueryHelpers.Linq;
+﻿using AzureServicesForUnity.Shared;
+using AzureServicesForUnity.Shared.QueryHelpers.Linq;
 using AzureServicesForUnity.Shared;
 using System;
 using System.Collections;

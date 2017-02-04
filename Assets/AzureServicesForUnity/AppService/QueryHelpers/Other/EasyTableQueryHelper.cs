@@ -1,10 +1,10 @@
-﻿using AzureServicesForUnity.AppService.QueryHelpers.Linq;
+﻿using AzureServicesForUnity.Shared.QueryHelpers.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.Other
+namespace AzureServicesForUnity.Shared.QueryHelpers.Other
 {
     public class EasyTableQueryHelper<T>
     {

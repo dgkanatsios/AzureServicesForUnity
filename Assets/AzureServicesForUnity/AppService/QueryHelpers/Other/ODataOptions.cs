@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // ----------------------------------------------------------------------------
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.Other
+namespace AzureServicesForUnity.Shared.QueryHelpers.Other
 {
     internal static class ODataOptions
     {

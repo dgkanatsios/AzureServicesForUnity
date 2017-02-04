@@ -6,7 +6,7 @@ using System;
 using System.Linq.Expressions;
 
 
-namespace AzureServicesForUnity.AppService.QueryHelpers.Other
+namespace AzureServicesForUnity.Shared.QueryHelpers.Other
 {
     /// <summary>
     /// Visit all the members of specific types of expression tree nodes.  This

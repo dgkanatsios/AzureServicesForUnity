@@ -1,4 +1,4 @@
-﻿using AzureServicesForUnity.AppService;
+﻿using AzureServicesForUnity.Shared;
 using AzureServicesForUnity.Shared;
 using System;
 using System.Collections.Generic;
