@@ -1,11 +1,11 @@
 ﻿using AzureServicesForUnity.Shared;
-using AzureServicesForUnity.Shared;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace AzureServicesForUnity.Storage
@@ -34,12 +34,26 @@ namespace AzureServicesForUnity.Storage
 
             string message = CanonicalizeHttpRequest(www, accountName);
 
+            if (!string.IsNullOrEmpty(TableStorage.Instance.AuthenticationToken))
+            {
+                byte[] KeyValue = Convert.FromBase64String(TableStorage.Instance.AuthenticationToken);
+                string signature = ComputeHmac256(KeyValue, message);
 
-            byte[] KeyValue = Convert.FromBase64String(TableStorage.Instance.AuthenticationToken);
-            string signature = ComputeHmac256(KeyValue, message);
-
-            www.SetRequestHeader(AuthorizationHeaderName, GetAuthorization(accountName, signature));
-
+                www.SetRequestHeader(AuthorizationHeaderName, GetAuthorization(accountName, signature));
+            }
+            else if(!string.IsNullOrEmpty(TableStorage.Instance.SASToken))
+            {
+                if (url.Contains("?"))//already set via a query
+                {
+                    url += "&" + TableStorage.Instance.SASToken.Substring(1); //replace the "?" from SASToken with a "&"
+                }
+                else
+                {
+                    url += TableStorage.Instance.SASToken;
+                }
+                www.url = url; //re-set the URL
+                Debug.Log(url);
+            }
 
             www.downloadHandler = new DownloadHandlerBuffer();
 

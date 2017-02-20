@@ -4,7 +4,7 @@ using AzureServicesForUnity.Shared;
 using UnityEngine.Networking;
 using AzureServicesForUnity.Storage;
 using System;
-using AzureServicesForUnity.Shared;
+
 
 namespace AzureServicesForUnity
 {
@@ -15,6 +15,9 @@ namespace AzureServicesForUnity
 
         [HideInInspector]
         public string AuthenticationToken;
+
+        [HideInInspector]
+        public string SASToken;
 
         void Awake()
         {
