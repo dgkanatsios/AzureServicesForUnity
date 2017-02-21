@@ -1,8 +1,6 @@
 ﻿using AzureServicesForUnity.Shared;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
@@ -18,8 +16,8 @@ namespace AzureServicesForUnity.Storage
         public static string XMSDATENAME = "x-ms-date";
         public static string AuthorizationHeaderName = "Authorization";
 
-        
-        public static UnityWebRequest BuildStorageWebRequest(string url,  string method, string accountName, string json)
+
+        public static UnityWebRequest BuildStorageWebRequest(string url, string method, string accountName, string json)
         {
             UnityWebRequest www = new UnityWebRequest(url, method);
 
@@ -34,25 +32,31 @@ namespace AzureServicesForUnity.Storage
 
             string message = CanonicalizeHttpRequest(www, accountName);
 
-            if (!string.IsNullOrEmpty(TableStorage.Instance.AuthenticationToken))
-            {
-                byte[] KeyValue = Convert.FromBase64String(TableStorage.Instance.AuthenticationToken);
-                string signature = ComputeHmac256(KeyValue, message);
 
-                www.SetRequestHeader(AuthorizationHeaderName, GetAuthorization(accountName, signature));
-            }
-            else if(!string.IsNullOrEmpty(TableStorage.Instance.SASToken))
+            if (!string.IsNullOrEmpty(TableStorage.Instance.SASToken))
             {
-                if (url.Contains("?"))//already set via a query
+                if (url.Contains("?"))//already set via query string
                 {
-                    url += "&" + TableStorage.Instance.SASToken.Substring(1); //replace the "?" from SASToken with a "&"
+                    url += "&" + TableStorage.Instance.SASToken.Substring(1); //replace the "?" from the existing SASToken with a "&"
                 }
                 else
                 {
                     url += TableStorage.Instance.SASToken;
                 }
                 www.url = url; //re-set the URL
-                Debug.Log(url);
+            }
+            else if (!string.IsNullOrEmpty(TableStorage.Instance.AuthenticationToken))
+            {
+                //display a warning that this is a not recommended method
+                Debug.Log("You're using Shared Key authentication. You're highly encouraged to switch to SAS authentication");
+                byte[] KeyValue = Convert.FromBase64String(TableStorage.Instance.AuthenticationToken);
+                string signature = ComputeHmac256(KeyValue, message);
+
+                www.SetRequestHeader(AuthorizationHeaderName, GetAuthorization(accountName, signature));
+            }
+            else //if both SAS and authenticationtoken are empty, warn the user
+            {
+                Debug.Log("__BEWARE__! Both SAS and authentication tokens are not set, this request will be anonymous.");
             }
 
             www.downloadHandler = new DownloadHandlerBuffer();
@@ -67,7 +71,7 @@ namespace AzureServicesForUnity.Storage
             return www;
         }
 
-        internal static string ComputeHmac256(byte[] key, string message)
+        private static string ComputeHmac256(byte[] key, string message)
         {
             using (HashAlgorithm hashAlgorithm = new HMACSHA256(key))
             {
@@ -76,14 +80,13 @@ namespace AzureServicesForUnity.Storage
             }
         }
 
-        internal static string GetAuthorization(string accountName, string signature)
+        private static string GetAuthorization(string accountName, string signature)
         {
             return
-               //string.Format(CultureInfo.InvariantCulture, "{0} {1}:{2}", this.canonicalizer.AuthorizationScheme, this.credentials.AccountName, signature)
                string.Format(CultureInfo.InvariantCulture, "{0} {1}:{2}", "SharedKey", accountName, signature);
         }
 
-        public static string CanonicalizeHttpRequest(UnityWebRequest request, string accountName)
+        private static string CanonicalizeHttpRequest(UnityWebRequest request, string accountName)
         {
             // Add the method (GET, POST, PUT, or HEAD).
             CanonicalizedString canonicalizedString = new CanonicalizedString(request.method, 200);
@@ -108,21 +111,7 @@ namespace AzureServicesForUnity.Storage
 
 }
 
-public class StorageCredentials
-{
-    public string SASToken { get; private set; }
 
-    public string AccountName { get; private set; }
-
-    public bool IsAnonymous
-    {
-        get
-        {
-            return (this.SASToken == null) && (this.AccountName == null);
-        }
-    }
-
-}
 
 internal class CanonicalizedString
 {

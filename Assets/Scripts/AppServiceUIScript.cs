@@ -6,7 +6,6 @@ using AzureServicesForUnity.Shared.QueryHelpers.Other;
 using System.Linq;
 using UnityEngine.UI;
 using AzureServicesForUnity.Shared;
-using AzureServicesForUnity.Shared;
 
 public class AppServiceUIScript : MonoBehaviour
 {
@@ -17,7 +16,7 @@ public class AppServiceUIScript : MonoBehaviour
         Globals.DebugFlag = true;
 
         if (Globals.DebugFlag)
-            Debug.Log("instantiated Azure Services for Unity version " + Globals.LibraryVersion);
+            Debug.Log("instantiated Azure Services for Unity, version " + Globals.LibraryVersion);
 
         //get the authentication token somehow...
         //e.g. for facebook, check the Unity Facebook SDK at https://developers.facebook.com/docs/unity

@@ -18,10 +18,10 @@ public class StorageUIScript : MonoBehaviour
         Globals.DebugFlag = true;
 
         if (Globals.DebugFlag)
-            Debug.Log("instantiated Azure Services for Unity version " + Globals.LibraryVersion);
+            Debug.Log("instantiated Azure Services for Unity, version " + Globals.LibraryVersion);
 
-        //TableStorage.Instance.AuthenticationToken = "CxKQjfU47L22tk8GL7fnFVX9qGunZQkNXaW/OmrFXfIGnifoNxWxsd9HaZ6a5ZnDs4UQngqFRsGH0qEIwBve1w==";
-        TableStorage.Instance.SASToken = "?sv=2015-12-11&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-03-20T19%3A11%3A43Z&st=2017-02-18T11%3A11%3A43Z&spr=https&sig=dohu1Yr7xxPZxx1cte1pZyzt8LfLCwd1TtRRyoVts44%3D&api-version=2015-12-11";
+        //TableStorage.Instance.AuthenticationToken = "";
+        TableStorage.Instance.SASToken = "";
 }
 
     private void ShowError(string error)
@@ -92,8 +92,8 @@ public class StorageUIScript : MonoBehaviour
         Customer cust = new Customer();
         cust.PartitionKey = "Gkanatsios23";
         cust.RowKey = "Dimitris23";
-        cust.Age = 33;
-        cust.City = "Athens2";
+        cust.Age = 333;
+        cust.City = "Athens23";
 
         TableStorage.Instance.InsertEntity<Customer>(cust, "people3", insertEntityResponse =>
         {
@@ -106,6 +106,30 @@ public class StorageUIScript : MonoBehaviour
             else
             {
                 ShowError(insertEntityResponse.Exception.Message);
+            }
+        });
+        StatusText.text = "Loading...";
+    }
+
+    public void UpdateEntity()
+    {
+        Customer cust = new Customer();
+        cust.PartitionKey = "Gkanatsios23";
+        cust.RowKey = "Dimitris23";
+        cust.Age = 33;
+        cust.City = "Athens25";
+
+        TableStorage.Instance.UpdateEntity<Customer>(cust, "people3", updateEntityResponse =>
+        {
+            if (updateEntityResponse.Status == CallBackResult.Success)
+            {
+                string result = "UpdateEntity completed";
+                Debug.Log(result);
+                StatusText.text = result;
+            }
+            else
+            {
+                ShowError(updateEntityResponse.Exception.Message);
             }
         });
         StatusText.text = "Loading...";

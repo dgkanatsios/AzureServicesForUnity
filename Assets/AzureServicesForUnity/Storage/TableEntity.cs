@@ -17,14 +17,11 @@ namespace AzureServicesForUnity.Storage
             this.PartitionKey = partitionKey;
             this.RowKey = rowKey;
         }
+
         public string PartitionKey;
 
         public string RowKey;
 
-        //public DateTimeOffset Timestamp { get; set; }
-
-
-        //public string ETag { get; set; }
     }
 
 

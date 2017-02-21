@@ -1,6 +1,5 @@
 ﻿using AzureServicesForUnity.Shared;
 using AzureServicesForUnity.Shared.QueryHelpers.Linq;
-using AzureServicesForUnity.Shared;
 using System;
 using System.Collections;
 using UnityEngine;

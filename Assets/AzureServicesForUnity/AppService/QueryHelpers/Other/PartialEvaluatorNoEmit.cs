@@ -312,7 +312,7 @@ namespace AzureServicesForUnity.Shared.QueryHelpers.Other
 
         public static bool IsInteger(Type type)
         {
-            Type nnType = GetNonNullableType(type);
+            //Type nnType = GetNonNullableType(type);
             switch (Type.GetTypeCode(type))
             {
                 case TypeCode.SByte:
@@ -370,7 +370,7 @@ namespace AzureServicesForUnity.Shared.QueryHelpers.Other
 
         public static Delegate CreateDelegate(Type delegateType, EvaluatorState outer, int nArgs, Evaluator evaluator)
         {
-            MethodInfo miInvoke = delegateType.GetMethod("Invoke");
+            //MethodInfo miInvoke = delegateType.GetMethod("Invoke");
             var host = new EvaluatorHost(outer, nArgs, evaluator);
             return StrongDelegate.CreateDelegate(delegateType, host.Eval);
         }

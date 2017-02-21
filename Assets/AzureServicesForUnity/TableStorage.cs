@@ -35,8 +35,6 @@ namespace AzureServicesForUnity
             StartCoroutine(QueryTableInternal(query, tableName, onQueryTableCompleted));
         }
 
-    
-
         public void CreateTableIfNotExists(string tableName, Action<CallbackResponse> onCreateTableCompleted)
         {
             StartCoroutine(CreateTableIfNotExistsInternal(tableName, onCreateTableCompleted));
@@ -52,6 +50,20 @@ namespace AzureServicesForUnity
         {
             Utilities.ValidateForNull(instance, tableName, onInsertCompleted);
             StartCoroutine(InsertInternal(instance, tableName, onInsertCompleted));
+        }
+
+        public void UpdateEntity<T>(T instance, string tableName, Action<CallbackResponse> onUpdateCompleted)
+            where T : TableEntity
+        {
+            Utilities.ValidateForNull(instance, tableName, onUpdateCompleted, instance.PartitionKey, instance.RowKey);
+            StartCoroutine(UpdateInternal(instance, tableName, onUpdateCompleted));
+        }
+
+        public void InsertOrMergeEntity<T>(T instance, string tableName, Action<CallbackResponse> onInsertOrMergeCompleted)
+            where T : TableEntity
+        {
+            Utilities.ValidateForNull(instance, tableName, onInsertOrMergeCompleted, instance.PartitionKey, instance.RowKey);
+            StartCoroutine(InsertOrMergeInternal(instance, tableName, onInsertOrMergeCompleted));
         }
 
         private IEnumerator InsertInternal<T>(T instance, string tableName, Action<CallbackResponse> onInsertCompleted)
@@ -70,7 +82,7 @@ namespace AzureServicesForUnity
 
                 if (Utilities.IsWWWError(www))
                 {
-                    if (Globals.DebugFlag) Debug.Log(www.error);
+                    if (Globals.DebugFlag) Debug.Log(www.error ?? "Error " + www.responseCode);
                     Utilities.BuildResponseObjectOnFailure(response, www);
                 }
 
@@ -83,6 +95,64 @@ namespace AzureServicesForUnity
                     response.Status = CallBackResult.Success;
                 }
                 onInsertCompleted(response);
+            }
+        }
+
+        private IEnumerator UpdateInternal<T>(T instance, string tableName, Action<CallbackResponse> onUpdateCompleted)
+        where T : TableEntity
+        {
+            string url = string.Format("{0}{1}(PartitionKey='{2}', RowKey='{3}')", Url, tableName, instance.PartitionKey, instance.RowKey);
+
+            string json = JsonUtility.ToJson(instance);
+            using (UnityWebRequest www =
+                StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Put.ToString(), AccountName, json))
+            {
+                yield return www.Send();
+                if (Globals.DebugFlag) Debug.Log(www.responseCode);
+
+                CallbackResponse<T> response = new CallbackResponse<T>();
+
+                if (Utilities.IsWWWError(www))
+                {
+                    if (Globals.DebugFlag) Debug.Log(www.error ?? "Error " + www.responseCode);
+                    Utilities.BuildResponseObjectOnFailure(response, www);
+                }
+
+                else if (www.downloadHandler != null)  //all OK
+                {
+                    if (Globals.DebugFlag) Debug.Log("successfully updated object");
+                    response.Status = CallBackResult.Success;
+                }
+                onUpdateCompleted(response);
+            }
+        }
+
+        private IEnumerator InsertOrMergeInternal<T>(T instance, string tableName, Action<CallbackResponse> onInsertOrMergeCompleted)
+        where T : TableEntity
+        {
+            string url = string.Format("{0}{1}(PartitionKey='{2}', RowKey='{3}')", Url, tableName, instance.PartitionKey, instance.RowKey);
+
+            string json = JsonUtility.ToJson(instance);
+            using (UnityWebRequest www =
+                StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Merge.ToString(), AccountName, json))
+            {
+                yield return www.Send();
+                if (Globals.DebugFlag) Debug.Log(www.responseCode);
+
+                CallbackResponse<T> response = new CallbackResponse<T>();
+
+                if (Utilities.IsWWWError(www))
+                {
+                    if (Globals.DebugFlag) Debug.Log(www.error ?? "Error " + www.responseCode);
+                    Utilities.BuildResponseObjectOnFailure(response, www);
+                }
+
+                else if (www.downloadHandler != null)  //all OK
+                {
+                    if (Globals.DebugFlag) Debug.Log("successfully inserted or merged object");
+                    response.Status = CallBackResult.Success;
+                }
+                onInsertOrMergeCompleted(response);
             }
         }
 
@@ -100,7 +170,7 @@ namespace AzureServicesForUnity
 
                 if (Utilities.IsWWWError(www))
                 {
-                    if (Globals.DebugFlag) Debug.Log(www.error);
+                    if (Globals.DebugFlag) Debug.Log(www.error ?? "Error " + www.responseCode);
                     Utilities.BuildResponseObjectOnFailure(response, www);
                 }
                 else
@@ -126,7 +196,7 @@ namespace AzureServicesForUnity
 
                 if (Utilities.IsWWWError(www))
                 {
-                    if (Globals.DebugFlag) Debug.Log(www.error);
+                    if (Globals.DebugFlag) Debug.Log(www.error ?? "Error " + www.responseCode);
                     Utilities.BuildResponseObjectOnFailure(response, www);
                 }
                 else
@@ -153,14 +223,12 @@ namespace AzureServicesForUnity
 
                 if (Utilities.IsWWWError(www))
                 {
-                    if (Globals.DebugFlag) Debug.Log(www.error);
+                    if (Globals.DebugFlag) Debug.Log(www.error ?? "Error " + www.responseCode);
                     Utilities.BuildResponseObjectOnFailure(response, www);
                 }
-
                 else if (www.downloadHandler != null)  //all OK
                 {
                     //let's get the header for the new object that was created
-
                     T[] data = JsonHelper.GetJsonArrayFromTableStorage<T>(www.downloadHandler.text);
                     if (Globals.DebugFlag) Debug.Log("Received " + data.Length + " objects");
 

@@ -98,13 +98,13 @@ namespace AzureServicesForUnity.Shared
         [Serializable]
         private class Wrapper<T>
         {
-            public T[] array;
+            public T[] array = null;
         }
 
         [Serializable]
         private class TableStorageResult<T>
         {
-            public T[] value;
+            public T[] value = null;
         }
 
         public static T[] GetJsonArrayFromTableStorage<T>(string json)
@@ -120,7 +120,8 @@ namespace AzureServicesForUnity.Shared
         Get,
         Patch,
         Delete,
-        Put
+        Put,
+        Merge
     }
 }
 
