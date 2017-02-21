@@ -1,4 +1,4 @@
-﻿using AzureServicesForUnity.Helpers;
+﻿using AzureServicesForUnity.Shared;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -94,7 +94,7 @@ namespace AzureServicesForUnity
             string json = null;
             if (instance != null) json = JsonUtility.ToJson(instance);
 
-            using (UnityWebRequest www = Utilities.BuildWebRequest(GetApiUrl(apiname),
+            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest(GetApiUrl(apiname),
                 method.ToString(), json, AuthenticationToken))
             {
                 yield return www.Send();
