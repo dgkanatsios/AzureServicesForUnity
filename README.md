@@ -1,17 +1,18 @@
 # Azure Services For Unity 
-Microsoft Azure has a great service to host apps called [App Service](https://azure.microsoft.com/en-us/services/app-service/) which allows you to connect and expose a database via an awesome feature called [Easy Tables](https://azure.microsoft.com/en-us/blog/azure-app-service-updates-november-2015/)
+Microsoft Azure has a great service to host apps called [App Service](https://azure.microsoft.com/en-us/services/app-service/) which allows you to connect and expose a database via an awesome feature called [Easy Tables](https://azure.microsoft.com/en-us/blog/azure-app-service-updates-november-2015/). App Service also allows you to easily created various API endpoints for your game, via the Easy APIs feature. 
+Moreover, Azure Storage has a great NoSQL key-value store called [Table Storage Service](https://azure.microsoft.com/en-us/services/storage/tables/) which can be used to store precious data for your game (such as highscores, save data, chat logs etc.). This library also contains some methods to access Table Storage Service from within a Unity game.
 
-Unity has a great class to do HTTP requests called [UnityWebRequest](http://docs.unity3d.com/Manual/UnityWebRequest.html). It's relatively new but it can be really helpful. Plus, there is another handy class called [JsonUtility](http://docs.unity3d.com/ScriptReference/JsonUtility.html) that assists in JSON serialization/deserialization.
+In the project source files you can find two scenes, one that contains demos for App Service and one for Table Storage. 
 
-Combine the above two paragraphs and you have a small cross platform library that allows a Unity game easy access Azure Easy Tables (yes, very easy!).
-
-Sample scene points to a Azure web app hosted in a free Azure App Service deployment, so it can take some time to respond in subsequent requests.
-
-For information and usage instructions check [here](https://dgkanatsios.com/2016/04/14/use-azure-services-from-unity/) and the demo scene included in the source code.
-
-I've also made some changes to the API compared to the one in the blog post, check [here](https://dgkanatsios.com/2016/09/01/an-update-to-azure-services-for-unity-library/)!
+There are three blog posts that describe the library and its usage
+- [Original blog post](https://dgkanatsios.com/2016/04/14/use-azure-services-from-unity/) describing the library and Easy Tables access
+- [Updates, fixes and workarounds](https://dgkanatsios.com/2016/09/01/an-update-to-azure-services-for-unity-library/)
+- [Accessing Table Storage](https://dgkanatsios.com/2017/02/21/accessing-azure-table-service-from-a-unity-game/)
 
 ###Changelog
+
+###version 0.0.11 (21/2/2017)
+- Added methods to access Azure Table Service to use as a game backend
 
 ###version 0.0.10
 - Changes in Easy APIs API (no, that's correct!) so that there are two methods now, one to return a single and one to return multiple results
