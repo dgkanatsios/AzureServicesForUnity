@@ -9,6 +9,10 @@ There are three blog posts that describe the library and its usage
 - [Updates, fixes and workarounds](https://dgkanatsios.com/2016/09/01/an-update-to-azure-services-for-unity-library/)
 - [Accessing Table Storage](https://dgkanatsios.com/2017/02/21/accessing-azure-table-service-from-a-unity-game/)
 
+###Usage
+In the root folder you'll find two scenes that contain demos for App Service and Storage interaction, respectively. Their relevant source files exist in the UIScripts folder. Main library resides in the AppServicesForUnity folder. In this folder, the AppService and Storage folders contain isolated code about AppService and Storage, respectively whereas the Shared folder contains code used by both.
+So, in order to use this library in your Unity game, copy the AppServicesForUnity folder into your project and delete the folder you do not need. To use the library, copy the relevant code from the UIScripts folder.
+
 ###Changelog
 
 ###version 0.0.11 (21/2/2017)
