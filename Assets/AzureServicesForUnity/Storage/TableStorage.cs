@@ -13,6 +13,13 @@ namespace AzureServicesForUnity.Storage
         //public string Url;
         public static TableStorage Instance;
 
+        private string accountName;
+        public void SetAccountName(string accountName)
+        {
+            this.accountName = accountName;
+            Url = string.Format("https://{0}.table.core.windows.net/", accountName);
+        }
+
         [HideInInspector]
         public string AuthenticationToken;
 
@@ -22,11 +29,10 @@ namespace AzureServicesForUnity.Storage
         void Awake()
         {
             Instance = this;
-            Url = string.Format("https://{0}.table.core.windows.net/", AccountName);
         }
 
         private string Url;
-        public string AccountName = "unitystorage2";
+       
 
         public void QueryTable<T>(string query, string tableName, Action<CallbackResponse<T[]>> onQueryTableCompleted)
             where T : TableEntity
@@ -73,7 +79,7 @@ namespace AzureServicesForUnity.Storage
 
             string json = JsonUtility.ToJson(instance);
             using (UnityWebRequest www =
-                StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Post.ToString(), AccountName, json))
+                StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Post.ToString(), accountName, json))
             {
                 yield return www.Send();
                 if (Globals.DebugFlag) Debug.Log(www.responseCode);
@@ -105,7 +111,7 @@ namespace AzureServicesForUnity.Storage
 
             string json = JsonUtility.ToJson(instance);
             using (UnityWebRequest www =
-                StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Put.ToString(), AccountName, json))
+                StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Put.ToString(), accountName, json))
             {
                 yield return www.Send();
                 if (Globals.DebugFlag) Debug.Log(www.responseCode);
@@ -134,7 +140,7 @@ namespace AzureServicesForUnity.Storage
 
             string json = JsonUtility.ToJson(instance);
             using (UnityWebRequest www =
-                StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Merge.ToString(), AccountName, json))
+                StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Merge.ToString(), accountName, json))
             {
                 yield return www.Send();
                 if (Globals.DebugFlag) Debug.Log(www.responseCode);
@@ -160,7 +166,7 @@ namespace AzureServicesForUnity.Storage
         {
             string url = string.Format("{0}Tables('{1}')", Url, tableName);
 
-            using (UnityWebRequest www = StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Delete.ToString(), AccountName, string.Empty))
+            using (UnityWebRequest www = StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Delete.ToString(), accountName, string.Empty))
 
             {
                 yield return www.Send();
@@ -186,7 +192,7 @@ namespace AzureServicesForUnity.Storage
             string url = Url + "Tables()";
 
             string json = string.Format("{{\"TableName\":\"{0}\"}}", tableName);
-            using (UnityWebRequest www = StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Post.ToString(), AccountName, json))
+            using (UnityWebRequest www = StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Post.ToString(), accountName, json))
 
             {
                 yield return www.Send();
@@ -214,7 +220,7 @@ namespace AzureServicesForUnity.Storage
 
 
             using (UnityWebRequest www =
-                StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Get.ToString(), AccountName, string.Empty))
+                StorageUtilities.BuildStorageWebRequest(url, HttpMethod.Get.ToString(), accountName, string.Empty))
             {
                 yield return www.Send();
                 if (Globals.DebugFlag) Debug.Log(www.responseCode);

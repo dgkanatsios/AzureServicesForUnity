@@ -20,8 +20,12 @@ public class StorageUIScript : MonoBehaviour
         if (Globals.DebugFlag)
             Debug.Log("instantiated Azure Services for Unity, version " + Globals.LibraryVersion);
 
+        //your storage account name
+        TableStorage.Instance.SetAccountName("unitystorage2");
+
+        //fill either one of the below
         //TableStorage.Instance.AuthenticationToken = "";
-        TableStorage.Instance.SASToken = "";
+        TableStorage.Instance.SASToken = "?sv=2015-12-11&ss=t&srt=sco&sp=rwdlacup&st=2017-01-22T11%3A27%3A00Z&se=2017-03-23T11%3A27%3A00Z&sig=t4YVEck1VU%2Fz046vscXiRuWrrkrtdG3Rn5Z8XVqvzOU%3D";
 }
 
     private void ShowError(string error)
