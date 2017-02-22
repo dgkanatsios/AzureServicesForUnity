@@ -6,6 +6,16 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
+#if NETFX_CORE
+
+using Windows.Security.Cryptography.Core;
+
+using Windows.Security.Cryptography;
+
+using System.Runtime.InteropServices.WindowsRuntime;
+
+#endif
+
 namespace AzureServicesForUnity.Storage
 {
     public class StorageUtilities
@@ -73,11 +83,19 @@ namespace AzureServicesForUnity.Storage
 
         private static string ComputeHmac256(byte[] key, string message)
         {
+#if NETFX_CORE
+
+			MacAlgorithmProvider provider = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);
+			CryptographicHash hash = provider.CreateHash(key.AsBuffer());
+			hash.Append(CryptographicBuffer.ConvertStringToBinary(message, BinaryStringEncoding.Utf8));
+			return CryptographicBuffer.EncodeToBase64String(hash.GetValueAndReset());
+#else
             using (HashAlgorithm hashAlgorithm = new HMACSHA256(key))
             {
                 byte[] messageBuffer = Encoding.UTF8.GetBytes(message);
                 return Convert.ToBase64String(hashAlgorithm.ComputeHash(messageBuffer));
             }
+#endif
         }
 
         private static string GetAuthorization(string accountName, string signature)
