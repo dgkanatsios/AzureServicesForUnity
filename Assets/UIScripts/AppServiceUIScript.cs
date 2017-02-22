@@ -6,6 +6,7 @@ using AzureServicesForUnity.Shared.QueryHelpers.Other;
 using System.Linq;
 using UnityEngine.UI;
 using AzureServicesForUnity.Shared;
+using AzureServicesForUnity.AppService;
 
 public class AppServiceUIScript : MonoBehaviour
 {

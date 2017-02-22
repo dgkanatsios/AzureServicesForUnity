@@ -1,11 +1,12 @@
-﻿using AzureServicesForUnity.Shared;
+﻿using AzureServicesForUnity.AppService;
+using AzureServicesForUnity.Shared;
 using AzureServicesForUnity.Shared.QueryHelpers.Linq;
 using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace AzureServicesForUnity
+namespace AzureServicesForUnity.AppService
 {
     public class EasyTables : MonoBehaviour
     {
@@ -67,7 +68,7 @@ namespace AzureServicesForUnity
         private IEnumerator DeleteByIDInternal<T>(string id, Action<CallbackResponse> onDeleteCompleted)
             where T : AppServiceObjectBase
         {
-            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest
+            using (UnityWebRequest www = AppServiceUtilities.BuildAppServiceWebRequest
                 (GetEasyTablesUrl<T>() + "/" + WWW.EscapeURL(id), HttpMethod.Delete.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
@@ -93,7 +94,7 @@ namespace AzureServicesForUnity
         {
             string json = JsonUtility.ToJson(instance);
 
-            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest(GetEasyTablesUrl<T>(),
+            using (UnityWebRequest www = AppServiceUtilities.BuildAppServiceWebRequest(GetEasyTablesUrl<T>(),
                 HttpMethod.Post.ToString(), json, AuthenticationToken))
             {
                 yield return www.Send();
@@ -130,7 +131,7 @@ namespace AzureServicesForUnity
         private IEnumerator SelectByIDInternal<T>(string id, Action<CallbackResponse<T>> onSelectByIDCompleted)
             where T : AppServiceObjectBase
         {
-            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest
+            using (UnityWebRequest www = AppServiceUtilities.BuildAppServiceWebRequest
                 (GetEasyTablesUrl<T>() + "/" + WWW.EscapeURL(id), HttpMethod.Get.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
@@ -169,7 +170,7 @@ namespace AzureServicesForUnity
                 url += "?" + query.ToODataString();
             }
             if (Globals.DebugFlag) Debug.Log(url);
-            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest(url,
+            using (UnityWebRequest www = AppServiceUtilities.BuildAppServiceWebRequest(url,
                 HttpMethod.Get.ToString(), null, AuthenticationToken))
             {
                 yield return www.Send();
@@ -220,7 +221,7 @@ namespace AzureServicesForUnity
            where T : AppServiceObjectBase
         {
             string json = JsonUtility.ToJson(instance);
-            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest(GetEasyTablesUrl<T>(),
+            using (UnityWebRequest www = AppServiceUtilities.BuildAppServiceWebRequest(GetEasyTablesUrl<T>(),
                 HttpMethod.Patch.ToString(), json, AuthenticationToken))
             {
                 yield return www.Send();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AzureServicesForUnity.Shared
+namespace AzureServicesForUnity.AppService
 {
     /// <summary>
     /// Static variables
@@ -17,7 +17,7 @@ namespace AzureServicesForUnity.Shared
 
         public static readonly string ZumoAuth = "X-ZUMO-AUTH";
 
-        public static readonly string ErrorOccurred = "Error occurred";
+        
 
    
 

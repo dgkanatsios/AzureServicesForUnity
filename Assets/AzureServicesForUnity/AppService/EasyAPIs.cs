@@ -1,4 +1,5 @@
-﻿using AzureServicesForUnity.Shared;
+﻿using AzureServicesForUnity.AppService;
+using AzureServicesForUnity.Shared;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace AzureServicesForUnity
+namespace AzureServicesForUnity.AppService
 {
     public class EasyAPIs : MonoBehaviour
     {
@@ -94,7 +95,7 @@ namespace AzureServicesForUnity
             string json = null;
             if (instance != null) json = JsonUtility.ToJson(instance);
 
-            using (UnityWebRequest www = Utilities.BuildAppServiceWebRequest(GetApiUrl(apiname),
+            using (UnityWebRequest www = AppServiceUtilities.BuildAppServiceWebRequest(GetApiUrl(apiname),
                 method.ToString(), json, AuthenticationToken))
             {
                 yield return www.Send();

@@ -7,13 +7,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 #if NETFX_CORE
-
 using Windows.Security.Cryptography.Core;
-
 using Windows.Security.Cryptography;
-
 using System.Runtime.InteropServices.WindowsRuntime;
-
 #endif
 
 namespace AzureServicesForUnity.Storage
@@ -123,9 +119,6 @@ namespace AzureServicesForUnity.Storage
             return canonicalizedString.ToString();
         }
     }
-
-
-
 
 }
 

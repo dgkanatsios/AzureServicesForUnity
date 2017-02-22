@@ -6,7 +6,7 @@ using AzureServicesForUnity.Storage;
 using System;
 
 
-namespace AzureServicesForUnity
+namespace AzureServicesForUnity.Storage
 {
     public class TableStorage : MonoBehaviour
     {
