@@ -14,6 +14,6 @@ namespace AzureServicesForUnity.Shared
         public static readonly string ApplicationJson = "application/json";
         public static readonly string ErrorOccurred = "Error occurred";
 
-        public static readonly string LibraryVersion = "0.0.11";
+        public static readonly string LibraryVersion = "0.0.12";
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AzureServicesForUnity.Storage
+namespace AzureServicesForUnity.Shared
 {
     [Serializable()]
     public class TableEntity

@@ -1,11 +1,19 @@
 ﻿using AzureServicesForUnity.Shared;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Networking;
+
+#if NETFX_CORE
+using Windows.Security.Cryptography.Core;
+using Windows.Security.Cryptography;
+using System.Runtime.InteropServices.WindowsRuntime;
+#endif
 
 namespace AzureServicesForUnity.Shared
 {
@@ -22,6 +30,8 @@ namespace AzureServicesForUnity.Shared
             }
 
         }
+
+
 
         public static bool IsWWWError(UnityWebRequest www)
         {
@@ -53,37 +63,47 @@ namespace AzureServicesForUnity.Shared
             response.Exception = ex;
         }
 
+        public static string ComputeHmac256(byte[] key, string message)
+        {
+#if NETFX_CORE
+
+			MacAlgorithmProvider provider = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);
+			CryptographicHash hash = provider.CreateHash(key.AsBuffer());
+			hash.Append(CryptographicBuffer.ConvertStringToBinary(message, BinaryStringEncoding.Utf8));
+			return CryptographicBuffer.EncodeToBase64String(hash.GetValueAndReset());
+#else
+            using (HashAlgorithm hashAlgorithm = new HMACSHA256(key))
+            {
+                byte[] messageBuffer = Encoding.UTF8.GetBytes(message);
+                return Convert.ToBase64String(hashAlgorithm.ComputeHash(messageBuffer));
+            }
+#endif
+        }
+
+        public static string GetAuthorization(string accountName, string signature)
+        {
+            return
+               string.Format(CultureInfo.InvariantCulture, "{0} {1}:{2}", "SharedKey", accountName, signature);
+        }
+
+        public static string CanonicalizeHttpRequest(UnityWebRequest request, string accountName)
+        {
+            CanonicalizedString canonicalizedString = new CanonicalizedString(request.method, 200);
+
+            canonicalizedString.AppendCanonicalizedElement(request.GetRequestHeader("ContentMd5"));
+            canonicalizedString.AppendCanonicalizedElement(request.GetRequestHeader("Content-Type"));
+
+            AuthenticationUtility.AppendCanonicalizedDateHeader(canonicalizedString, request, true);
+
+            string resourceString = AuthenticationUtility.GetCanonicalizedResourceString(new Uri(request.url), accountName, true);
+            canonicalizedString.AppendCanonicalizedElement(resourceString);
+
+            return canonicalizedString.ToString();
+        }
 
     }
 
-    //http://forum.unity3d.com/threads/how-to-load-an-array-with-jsonutility.375735/#post-2585129
-    public class JsonHelper
-    {
-        public static T[] GetJsonArray<T>(string json)
-        {
-            string newJson = "{ \"array\": " + json + "}";
-            Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(newJson);
-            return wrapper.array;
-        }
-
-        [Serializable]
-        private class Wrapper<T>
-        {
-            public T[] array = null;
-        }
-
-        [Serializable]
-        private class TableStorageResult<T>
-        {
-            public T[] value = null;
-        }
-
-        public static T[] GetJsonArrayFromTableStorage<T>(string json)
-        {
-            TableStorageResult<T> result = JsonUtility.FromJson<TableStorageResult<T>>(json);
-            return result.value;
-        }
-    }
+  
 
     public enum HttpMethod
     {
