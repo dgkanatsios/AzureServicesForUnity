@@ -9,7 +9,7 @@ using AzureServicesForUnity.Shared;
 public class StorageUIScript : MonoBehaviour
 {
     public Text StatusText;
-    
+
 
     public void Start()
     {
@@ -19,12 +19,13 @@ public class StorageUIScript : MonoBehaviour
             Debug.Log("instantiated Azure Services for Unity, version " + Globals.LibraryVersion);
 
         //your storage account name
-        TableStorageClient.Instance.SetAccountName("gkanatsiostestsearch");
+        TableStorageClient.Instance.SetAccountName("STORAGE ACCOUNT NAME");
 
         //fill either one of the below
+
         //TableStorage.Instance.AuthenticationToken = "";
-        TableStorageClient.Instance.SASToken = "?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-05-02T18:37:09Z&st=2017-05-01T10:37:09Z&spr=https&sig=%2BcEz%2BqwTnMMillQxN9rdAIHinIAznuvJiSjt25oYx9A%3D";// "?sv=2015-12-11&ss=t&srt=sco&sp=rwdlacup&st=2017-01-22T11%3A27%3A00Z&se=2017-03-23T11%3A27%3A00Z&sig=t4YVEck1VU%2Fz046vscXiRuWrrkrtdG3Rn5Z8XVqvzOU%3D";
-}
+        TableStorageClient.Instance.SASToken = "?sv=2015-12-11&ss=t&srt=sco&sp=rwdlacup&st=2017-01-22T11%3A27%3A00Z&se=2017-03-23T11%3A27%3A00Z&sig=t4YVEck1VU%2Fz04_I_AM_A_SAS_SAMPLE_6vscXiVqvzOU%3D";
+    }
 
     private void ShowError(string error)
     {
@@ -34,24 +35,25 @@ public class StorageUIScript : MonoBehaviour
 
     public void QueryTable()
     {
-        //Age >= 30 && Age <= 33
-        TableQuery tq = new TableQuery();
-        tq.filter = "Age ge 30 and Age le 33";
-        tq.select = "PartitionKey,RowKey,Age,City";
 
-        TableStorageClient.Instance.QueryTable<Customer>(tq,"people3", queryTableResponse =>
+        TableQuery tq = new TableQuery()
         {
-            if (queryTableResponse.Status == CallBackResult.Success)
-            {
-                string result = "QueryTable completed";
-                Debug.Log(result);
-                StatusText.text = result;
-            }
-            else
-            {
-                ShowError(queryTableResponse.Exception.Message);
-            }
-        });
+            filter = "Age ge 30 and Age le 33", //Age >= 30 && Age <= 33
+            select = "PartitionKey,RowKey,Age,City"
+        };
+        TableStorageClient.Instance.QueryTable<Customer>(tq, "people3", queryTableResponse =>
+         {
+             if (queryTableResponse.Status == CallBackResult.Success)
+             {
+                 string result = "QueryTable completed";
+                 Debug.Log(result);
+                 StatusText.text = result;
+             }
+             else
+             {
+                 ShowError(queryTableResponse.Exception.Message);
+             }
+         });
         StatusText.text = "Loading...";
     }
 
@@ -94,12 +96,13 @@ public class StorageUIScript : MonoBehaviour
 
     public void InsertEntity()
     {
-        Customer cust = new Customer();
-        cust.PartitionKey = "Gkanatsios23";
-        cust.RowKey = "Dimitris23";
-        cust.Age = 333;
-        cust.City = "Athens23";
-
+        Customer cust = new Customer()
+        {
+            PartitionKey = "Gkanatsios23",
+            RowKey = "Dimitris23",
+            Age = 333,
+            City = "Athens23"
+        };
         TableStorageClient.Instance.InsertEntity<Customer>(cust, "people3", insertEntityResponse =>
         {
             if (insertEntityResponse.Status == CallBackResult.Success)
@@ -118,12 +121,13 @@ public class StorageUIScript : MonoBehaviour
 
     public void UpdateEntity()
     {
-        Customer cust = new Customer();
-        cust.PartitionKey = "Gkanatsios23";
-        cust.RowKey = "Dimitris23";
-        cust.Age = 33;
-        cust.City = "Athens25";
-
+        Customer cust = new Customer()
+        {
+            PartitionKey = "Gkanatsios23",
+            RowKey = "Dimitris23",
+            Age = 33,
+            City = "Athens25"
+        };
         TableStorageClient.Instance.UpdateEntity<Customer>(cust, "people3", updateEntityResponse =>
         {
             if (updateEntityResponse.Status == CallBackResult.Success)

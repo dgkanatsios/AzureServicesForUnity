@@ -31,7 +31,7 @@ namespace AzureServicesForUnity.Shared
             }
         }
 
-            private static string GetAbsolutePathWithoutSecondarySuffix(Uri uri, string accountName)
+        private static string GetAbsolutePathWithoutSecondarySuffix(Uri uri, string accountName)
         {
             string absolutePath = uri.AbsolutePath;
             string secondaryAccountName = string.Concat(accountName, "-secondary");
@@ -53,7 +53,7 @@ namespace AzureServicesForUnity.Shared
             canonicalizedResource.Append(accountName);
             canonicalizedResource.Append(GetAbsolutePathWithoutSecondarySuffix(uri, accountName));
 
-            IDictionary<string, string> queryParameters = new Dictionary<string,string>();
+            IDictionary<string, string> queryParameters = new Dictionary<string, string>();
             if (!isSharedKeyLiteOrTableService)
             {
                 List<string> queryParameterNames = new List<string>(queryParameters.Keys);

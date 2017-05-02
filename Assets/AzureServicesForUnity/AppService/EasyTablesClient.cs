@@ -269,8 +269,6 @@ namespace AzureServicesForUnity.AppService
 ///Basic OData tutorial: http://www.odata.org/getting-started/basic-tutorial/
 ///OData URI conventions: http://www.odata.org/documentation/odata-version-2-0/uri-conventions/
 ///OData operations: http://www.odata.org/documentation/odata-version-2-0/operations/
-///Walkthough: creating an IQueryable LINQ provider: https://msdn.microsoft.com/en-us/library/bb546158(v=vs.110).aspx
-///Building an IQueryable provider blog post series: https://blogs.msdn.microsoft.com/mattwar/page/3/
 ///Add authentication to your Windows app: https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-windows-store-dotnet-get-started-users/
 ///How to configure Facebook authentication: https://azure.microsoft.com/en-us/documentation/articles/app-service-mobile-how-to-configure-facebook-authentication/
 

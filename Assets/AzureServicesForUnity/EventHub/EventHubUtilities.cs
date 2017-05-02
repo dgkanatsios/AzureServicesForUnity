@@ -30,8 +30,10 @@ namespace AzureServicesForUnity.EventHub
             if (!string.IsNullOrEmpty(json))
             {
                 byte[] payload = Encoding.UTF8.GetBytes(json);
-                UploadHandler handler = new UploadHandlerRaw(payload);
-                handler.contentType = Globals.ApplicationJson;
+                UploadHandler handler = new UploadHandlerRaw(payload)
+                {
+                    contentType = Globals.ApplicationJson
+                };
                 www.uploadHandler = handler;
             }
             return www;
