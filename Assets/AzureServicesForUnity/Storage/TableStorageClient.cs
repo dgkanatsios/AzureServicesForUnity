@@ -237,10 +237,7 @@ namespace AzureServicesForUnity.Shared
                     T[] data = JsonHelper.GetJsonArrayFromTableStorage<T>(www.downloadHandler.text);
                     if (Globals.DebugFlag) Debug.Log("Received " + data.Length + " objects");
 
-                    foreach (var item in data)
-                    {
-                        Debug.Log(string.Format("Item with PartitionKey {0} and RowKey {1}", item.PartitionKey, item.RowKey));
-                    }
+                    response.Result = data;
                     response.Status = CallBackResult.Success;
                 }
                 onQueryTableCompleted(response);

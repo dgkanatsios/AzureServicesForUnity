@@ -45,9 +45,13 @@ public class StorageUIScript : MonoBehaviour
          {
              if (queryTableResponse.Status == CallBackResult.Success)
              {
-                 string result = "QueryTable completed";
-                 Debug.Log(result);
-                 StatusText.text = result;
+                 string status = "QueryTable completed";
+                 if (Globals.DebugFlag)  Debug.Log(status);
+                 foreach (var item in queryTableResponse.Result)
+                 {
+                     Debug.Log(string.Format("Item with PartitionKey {0} and RowKey {1}", item.PartitionKey, item.RowKey));
+                 }
+                 StatusText.text = status;
              }
              else
              {
