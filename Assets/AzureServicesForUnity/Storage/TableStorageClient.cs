@@ -215,7 +215,7 @@ namespace AzureServicesForUnity.Shared
         private IEnumerator QueryTableInternal<T>(TableQuery query, string tableName, Action<CallbackResponse<T[]>> onQueryTableCompleted)
         where T : TableEntity
         {
-            string url = string.Format("{0}{1}()?{2}", Url, tableName, query.ToString());
+            string url = string.Format("{0}{1}(){2}", Url, tableName, query.ToString());
 
 
             using (UnityWebRequest www =
