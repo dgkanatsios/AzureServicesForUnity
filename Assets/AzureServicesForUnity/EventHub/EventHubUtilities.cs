@@ -18,7 +18,11 @@ namespace AzureServicesForUnity.EventHub
             www.SetRequestHeader(Globals.Accept, Globals.ApplicationJson);
             www.SetRequestHeader(Globals.Content_Type, Globals.ApplicationJson);
 
+            //creating the token on the client is show here just for demo purposes, it is NOT good in security terms
+            //ideally, you should have some server code talking to Event Hubs and generating this for you
             string authorization = createToken(url, keyName, key);
+            //once you get it from the server, below line should be changed to
+            //string authorization = KEY_GENERATED_FROM_SERVER;
 
             www.SetRequestHeader("Authorization", authorization.Trim());
 
