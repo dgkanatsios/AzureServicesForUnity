@@ -41,6 +41,9 @@ namespace AzureServicesForUnity.EventHub
 
         //https://docs.microsoft.com/en-us/rest/api/eventhub/generate-sas-token
         //BAD PRACTICE - THIS SHOULD BE GENERATED SERVER SIDE!!!!
+        //this is included here just for the sake of the demo
+        //generating the token on the client side induces several security risks
+        //the proper way would be to run createToken function on the server side, get it on the client and use it
         private static string createToken(string resourceUri, string keyName, string key)
         {
             TimeSpan sinceEpoch = DateTime.UtcNow - new DateTime(1970, 1, 1);
