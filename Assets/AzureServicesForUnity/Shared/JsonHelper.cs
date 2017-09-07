@@ -6,6 +6,10 @@ using UnityEngine;
 
 namespace Assets.AzureServicesForUnity.Shared
 {
+    //I wanted this library to be plugin-free, that's why I'm using native JsonUtility
+    //however, you could take a look and use this one: https://github.com/SaladLab/Json.Net.Unity3D
+
+
     //http://forum.unity3d.com/threads/how-to-load-an-array-with-jsonutility.375735/#post-2585129
     public class JsonHelper
     {
