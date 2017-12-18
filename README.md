@@ -28,6 +28,9 @@ Nope, on purpose. One of the original goals of this library was to be plugin-fre
 #### Which platforms does this work?
 Hopefully on every platform supported by Unity. If you found a platform that this does not work, [ping me](https://github.com/dgkanatsios/AzureServicesForUnity/issues)!
 
+#### Can I use this SDK to access the [Cosmos DB Table API](https://docs.microsoft.com/en-us/azure/cosmos-db/table-introduction)?
+This should work, even though I haven't tested it yet. Raise an [Issue](https://github.com/dgkanatsios/AzureServicesForUnity/issues) if it doesn't work for you!
+
 #### I have a problem with the library, how can I report it?
 Use the [Issues](https://github.com/dgkanatsios/AzureServicesForUnity/issues) tab.
 
