@@ -1,5 +1,8 @@
 ## Changelog
 
+#### version 0.0.13 (2/1/2018)
+- Minor fix for CosmosDB Table API support
+
 #### version 0.0.12 (2/5/2017)
 - Added method to post data to Azure Event Hub
 
