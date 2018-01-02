@@ -43,8 +43,10 @@ namespace AzureServicesForUnity.Shared
             {
                 if (TableStorageClient.Instance.EndpointStorageType == EndpointStorageType.CosmosDBTableAPI)
                 {
-                    //CosmosDB Table API works only with AuthenticationToken/AccountKey
-                    string error = "CosmosDB Table API does not support SAS token, it works only with AuthenticationToken/AccountKey, please fix that in the code and try again";
+                    //CosmosDB Table API works only with AuthenticationToken, listed as Key on Azure Portal
+                    //you can use either the Primary key or the Secondary key
+                    //https://docs.microsoft.com/en-us/azure/cosmos-db/create-table-dotnet#update-your-connection-string
+                    string error = "CosmosDB Table API does not support SAS token, it works only with AuthenticationToken/Key, please fix this in the code and try again";
                     Debug.Log(error);
                     throw new Exception(error);
                 }
