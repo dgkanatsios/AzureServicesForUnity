@@ -16,7 +16,10 @@ namespace AzureServicesForUnity.Shared
         public void SetAccountName(string accountName)
         {
             this.accountName = accountName;
-            Url = string.Format("https://{0}.table.core.windows.net/", accountName);
+            if (EndpointStorageType == EndpointStorageType.TableStorage)
+                Url = string.Format("https://{0}.table.core.windows.net/", accountName);
+            else
+                Url = string.Format("https://{0}.table.cosmosdbazure.com/", accountName);
         }
 
         [HideInInspector]
@@ -24,6 +27,9 @@ namespace AzureServicesForUnity.Shared
 
         [HideInInspector]
         public string SASToken;
+
+        [HideInInspector]
+        public EndpointStorageType EndpointStorageType = EndpointStorageType.TableStorage;
 
         void Awake()
         {

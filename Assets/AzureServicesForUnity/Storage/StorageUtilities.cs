@@ -41,6 +41,14 @@ namespace AzureServicesForUnity.Shared
 
             if (!string.IsNullOrEmpty(TableStorageClient.Instance.SASToken))
             {
+                if (TableStorageClient.Instance.EndpointStorageType == EndpointStorageType.CosmosDBTableAPI)
+                {
+                    //CosmosDB Table API works only with AuthenticationToken/AccountKey
+                    string error = "CosmosDB Table API does not support SAS token, it works only with AuthenticationToken/AccountKey, please fix that in the code and try again";
+                    Debug.Log(error);
+                    throw new Exception(error);
+                }
+
                 if (url.Contains("?"))//already set via query string
                 {
                     url += "&" + TableStorageClient.Instance.SASToken.Substring(1); //replace the "?" from the existing SASToken with a "&"
@@ -54,7 +62,9 @@ namespace AzureServicesForUnity.Shared
             else if (!string.IsNullOrEmpty(TableStorageClient.Instance.AuthenticationToken))
             {
                 //display a warning that this is a not recommended method
-                if (Globals.DebugFlag) Debug.Log("You're using Shared Key authentication. You're highly encouraged to switch to SAS authentication");
+                //only displayed using Table Storage, since SAS is not supported in CosmosDB Table API
+                if (Globals.DebugFlag && TableStorageClient.Instance.EndpointStorageType == EndpointStorageType.TableStorage)
+                    Debug.Log("You're using Shared Key authentication. You're highly encouraged to switch to SAS authentication");
                 byte[] KeyValue = Convert.FromBase64String(TableStorageClient.Instance.AuthenticationToken);
                 string signature = Utilities.ComputeHmac256(KeyValue, message);
 
@@ -79,12 +89,16 @@ namespace AzureServicesForUnity.Shared
             return www;
         }
 
-       
+
     }
 
 }
 
-
+public enum EndpointStorageType
+{
+    TableStorage,
+    CosmosDBTableAPI
+}
 
 internal class CanonicalizedString
 {
