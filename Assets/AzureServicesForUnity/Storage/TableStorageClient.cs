@@ -19,7 +19,7 @@ namespace AzureServicesForUnity.Shared
             if (EndpointStorageType == EndpointStorageType.TableStorage)
                 Url = string.Format("https://{0}.table.core.windows.net/", accountName);
             else
-                Url = string.Format("https://{0}.table.cosmosdbazure.com/", accountName);
+                Url = string.Format("https://{0}.table.cosmosdb.azure.com/", accountName);
         }
 
         [HideInInspector]

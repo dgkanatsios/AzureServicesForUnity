@@ -28,7 +28,7 @@ public class StorageUIScript : MonoBehaviour
         //for Table Storage, fill either one of the below authentication methods
         //for CosmosDB Table API, you should use the AuthenticationToken credential by setting it with your AccountKey
 
-        //TableStorage.Instance.AuthenticationToken = "";
+        //TableStorageClient.Instance.AuthenticationToken = "";
         TableStorageClient.Instance.SASToken = "?sv=2015-12-11&ss=t&srt=sco&sp=rwdlacup&st=2017-01-22T11%3A27%3A00Z&se=2017-03-23T11%3A27%3A00Z&sig=t4YVEck1VU%2Fz04_I_AM_A_SAS_SAMPLE_6vscXiVqvzOU%3D";
     }
 
