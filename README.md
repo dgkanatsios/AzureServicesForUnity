@@ -1,7 +1,8 @@
-# Azure Services For Unity (Mobile Apps/App Service - Table Storage/CosmosDB Table API - Event Hubs)
-
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+![https://gaforgithub.azurewebsites.net/api?repo=AzureServicesForUnity]
+
+# Azure Services For Unity (Mobile Apps/App Service - Table Storage/CosmosDB Table API - Event Hubs)
 
 A library to access and use various Azure services useful for games written in Unity game engine. Includes (a) an SDK and (b) sample code that uses the SDK.
 
