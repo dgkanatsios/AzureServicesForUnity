@@ -1,6 +1,6 @@
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-![](https://gaforgithub.azurewebsites.net/api?repo=AzureServicesForUnity&empty)
+[![unofficial Google Analytics for GitHub](https://gaforgithub.azurewebsites.net/api?repo=AzureServicesForUnity)](https://github.com/dgkanatsios/gaforgithub)
 
 # Azure Services For Unity (Mobile Apps/App Service - Table Storage/CosmosDB Table API - Event Hubs)
 
