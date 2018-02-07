@@ -44,6 +44,9 @@ There are three blog posts that describe the library and its usage
 #### I want to add Facebook authentication to my game. How can I do that?
 On the server side you would want to do [this](https://docs.microsoft.com/en-us/azure/app-service-mobile/app-service-mobile-how-to-configure-facebook-authentication). On the client side, check the [Facebook Unity SDK](https://developers.facebook.com/docs/unity/). For other providers, chec [here](https://docs.microsoft.com/en-us/azure/app-service/app-service-authentication-overview).
 
+#### I want more information regarding App Service Authentication
+For more information regarding Azure App Service Authentication check [this GitHub repo](https://github.com/cgillum/easyauth).
+
 #### Are you using any external plugins?
 Nope, on purpose. One of the original goals of this library was to be plugin-free.
 
